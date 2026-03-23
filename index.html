@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongono Sensei</title>
+    <title>Nihongono Sensei - Complete</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -35,7 +35,10 @@
                 { role: 'ai', text: "Konnichiwa! I am your Sensei. I will explain Japanese using short, easy-to-read Hinglish or English logic. Ask me anything!" }
             ]);
             const chatEndRef = useRef(null);
-            const apiKey = "AIzaSyDTRM2SWKlPmXz3q_UtnDNp7Xpjatg_a-0";
+
+            // --- PASTE YOUR API KEY BETWEEN THE QUOTES BELOW ---
+            const apiKey = "AIzaSyDTRM2SWKlPmXz3q_UtnDNp7Xpjatg_a-0"; 
+            // --------------------------------------------------
 
             useEffect(() => {
                 if (window.lucide) window.lucide.createIcons();
@@ -114,14 +117,13 @@
                     const data = await response.json();
                     
                     if (data.error) {
-                        throw new Error(data.error.message);
+                        throw new Error(`${data.error.status}: ${data.error.message}`);
                     }
 
-                    const aiText = data.candidates[0].content.parts[0].text;
+                    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
                     setChatMessages(prev => [...prev, { role: 'ai', text: aiText }]);
                 } catch (err) {
-                    console.error("API Error:", err);
-                    setChatMessages(prev => [...prev, { role: 'ai', text: "Sensei is busy (API Error). Check if your key is restricted in AI Studio!" }]);
+                    setChatMessages(prev => [...prev, { role: 'ai', text: `Sensei Error: ${err.message}` }]);
                 } finally { setIsTyping(false); }
             };
 
