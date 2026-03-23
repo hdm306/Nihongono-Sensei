@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongono Sensei - Final Fix</title>
+    <title>Nihongono Sensei - Official</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -47,17 +47,45 @@
             const particleGroups = {
                 "The Big Three": [
                     { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...' },
-                    { p: 'ga', label: 'Subject', en: 'The specific actor.', hi: 'Karta (ne - ने)' },
-                    { p: 'o', label: 'Object', en: 'The target of action.', hi: 'Karma (ko - को)' }
+                    { p: 'ga', label: 'Subject', en: 'The actor.', hi: 'Karta (ne - ने)' },
+                    { p: 'o', label: 'Object', en: 'The target.', hi: 'Karma (ko - को)' }
+                ],
+                "Movement & Space": [
+                    { p: 'ni', label: 'Target', en: 'At/To.', hi: 'Sthan/Samay' },
+                    { p: 'e', label: 'Direction', en: 'Towards.', hi: 'Ki taraf' },
+                    { p: 'de', label: 'Active Loc', en: 'At (action).', hi: 'Me/Se (में/से)' }
+                ],
+                "Relationships": [
+                    { p: 'no', label: 'Possession', en: "X's Y.", hi: 'Ka/Ke/Ki' },
+                    { p: 'mo', label: 'Inclusion', en: 'Also / Too.', hi: 'Bhi (भी)' },
+                    { p: 'to', label: 'Together', en: 'And / With.', hi: 'Aur / Saath' }
+                ],
+                "Social Enders": [
+                    { p: 'ka', label: 'Question', en: '?', hi: 'Kya?' },
+                    { p: 'ne', label: 'Agreement', en: 'Right?', hi: 'Na?' },
+                    { p: 'yo', label: 'Assertion', en: 'Focus!', hi: 'Bata raha hoon!' }
                 ]
             };
 
             const particleDetails = {
-                wa: { title: "Topic (は)", en_logic: "Highlights the main topic.", hi_logic: "Main topic set karta hai.", multitask: "Contrast marker." }
+                wa: { title: "Topic (は)", en_logic: "Highlights the topic.", hi_logic: "Main topic set karta hai.", multitask: "Contrast marker." },
+                ga: { title: "Subject (が)", en_logic: "Points to the actor.", hi_logic: "Specific karta point karta hai.", multitask: "Introduces new info." },
+                o: { title: "Object (を)", en_logic: "Marks direct object.", hi_logic: "Karma ko point karta hai.", multitask: "Leaving a place." },
+                ni: { title: "Target (に)", en_logic: "Static time/place.", hi_logic: "Samay ya Sthan.", multitask: "Indirect object." },
+                e: { title: "Direction (へ)", en_logic: "Direction towards.", hi_logic: "Disha dikhata hai.", multitask: "Focus on path." },
+                de: { title: "Context (で)", en_logic: "Location of action.", hi_logic: "Kriya kahan ho rahi hai.", multitask: "Tool marker (by bus)." },
+                mo: { title: "Inclusion (も)", en_logic: "Also / Too.", hi_logic: "Bhi (भी).", multitask: "Everyone/Everything." },
+                no: { title: "Linker (の)", en_logic: "Possession.", hi_logic: "Ka/Ke/Ki.", multitask: "Noun replacement." },
+                to: { title: "Connector (と)", en_logic: "And / With.", hi_logic: "Aur / Saath.", multitask: "Quotations." },
+                ka: { title: "Question (か)", en_logic: "Question marker.", hi_logic: "Kya?", multitask: "Means 'or'." },
+                ne: { title: "Agreement (ね)", en_logic: "Right?", hi_logic: "Na?", multitask: "Softens tone." },
+                yo: { title: "Assertion (よ)", en_logic: "Emphasis.", hi_logic: "Bata raha hoon!", multitask: "New info." }
             };
 
             const kosoData = {
-                item: { title: "Pronouns", bridgeEn: "This / That", bridgeHi: "Yeh / Woh", tip: "Kore, Sore, Are." }
+                item: { title: "Kore / Sore / Are / Dore", bridgeEn: "This / That / That Over There / Which One", bridgeHi: "Yeh / Woh / Woh Door Wala / Kaunsa", tip: "Standalone pronouns." },
+                place: { title: "Koko / Soko / Asoko / Doko", bridgeEn: "Here / There / Over There / Where", bridgeHi: "Yahan / Wahan / Wahan Door / Kahan", tip: "Locations." },
+                adj: { title: "Kono / Sono / Ano / Dono", bridgeEn: "This [Noun] / That [Noun]", bridgeHi: "Yeh [Noun] / Woh [Noun]", tip: "Needs a noun!" }
             };
 
             const askSensei = async () => {
@@ -68,13 +96,12 @@
                 setIsTyping(true);
 
                 const langLogic = bridge === 'hi' 
-                    ? "Respond in short Hinglish."
-                    : "Respond in short English.";
+                    ? "Respond in Hinglish. Use line breaks. wa=toh, o=ko, ga=ne, ni=ko, de=me/se."
+                    : "Respond in English. Translation, Roomaji, and Grammar.";
 
-                const fullPrompt = `Instruction: You are Nihongono Sensei. ${langLogic} Focus on particles. User Question: ${msg}`;
+                const fullPrompt = `Instruction: You are Nihongono Sensei. ${langLogic} Focus on particles. Concise. User Question: ${msg}`;
 
                 try {
-                    // Using the "latest" tag which is the most compatible
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -84,10 +111,7 @@
                     });
                     
                     const data = await response.json();
-                    
-                    if (data.error) {
-                        throw new Error(`${data.error.status}: ${data.error.message}`);
-                    }
+                    if (data.error) throw new Error(`${data.error.status}: ${data.error.message}`);
 
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sensei is busy.";
                     setChatMessages(prev => [...prev, { role: 'ai', text: aiText }]);
@@ -101,31 +125,98 @@
                     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-100 px-6 py-4 flex items-center justify-between">
                         <h1 className="text-xl font-black tracking-tighter">Nihongono <span className="text-rose-500">Sensei</span></h1>
                         <div className="flex gap-1 p-1 bg-slate-50 rounded-lg border border-slate-100">
-                            <button onClick={() => setBridge('en')} className="text-[10px] px-3 py-1">EN</button>
-                            <button onClick={() => setBridge('hi')} className="text-[10px] px-3 py-1">HI</button>
+                            <button onClick={() => setBridge('en')} className={`text-[10px] font-bold px-3 py-1 rounded transition-all ${bridge === 'en' ? 'bg-white shadow-sm' : 'text-slate-400'}`}>EN</button>
+                            <button onClick={() => setBridge('hi')} className={`text-[10px] font-bold px-3 py-1 rounded transition-all ${bridge === 'hi' ? 'bg-white text-rose-500 shadow-sm' : 'text-slate-400'}`}>HI</button>
                         </div>
                     </nav>
 
-                    <main className="max-w-4xl mx-auto p-4">
-                        <div className="flex justify-center gap-2 mb-10">
-                            <button onClick={() => setActiveTab('particles')} className="px-6 py-3 bg-slate-100 rounded-full text-xs font-bold">Particles</button>
-                            <button onClick={() => setActiveTab('ai')} className="px-6 py-3 bg-indigo-600 text-white rounded-full text-xs font-bold">AI Lab</button>
+                    <main className="max-w-6xl mx-auto p-4 md:p-10">
+                        <div className="flex justify-center gap-2 mb-10 overflow-x-auto no-scrollbar">
+                            <NavBtn active={activeTab === 'particles'} onClick={() => setActiveTab('particles')} icon="layers" label="Particles" />
+                            <NavBtn active={activeTab === 'numbers'} onClick={() => setActiveTab('numbers')} icon="hash" label="Numbers" />
+                            <NavBtn active={activeTab === 'kosoado'} onClick={() => setActiveTab('kosoado')} icon="map" label="Kosoado" />
+                            <NavBtn active={activeTab === 'ai'} onClick={() => setActiveTab('ai')} icon="sparkles" label="AI Lab" color="text-indigo-600" />
                         </div>
 
-                        {activeTab === 'ai' && (
-                            <div className="h-[500px] bg-white rounded-3xl shadow-xl flex flex-col overflow-hidden">
-                                <div className="flex-1 p-6 overflow-y-auto space-y-4 no-scrollbar">
-                                    {chatMessages.map((m, i) => (
-                                        <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                            <div className={`p-4 rounded-2xl text-sm ${m.role === 'user' ? 'bg-slate-900 text-white' : 'bg-slate-100'}`}>{m.text}</div>
+                        {activeTab === 'particles' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in">
+                                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {Object.entries(particleGroups).map(([name, items], i) => (
+                                        <div key={i} className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm">
+                                            <div className="bg-slate-900 px-6 py-3"><h3 className="text-[9px] font-black uppercase text-rose-500 tracking-widest">{name}</h3></div>
+                                            <div className="p-4 space-y-2">
+                                                {items.map((item, j) => (
+                                                    <div key={j} onClick={() => setSelectedParticle(item.p)} className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-all ${selectedParticle === item.p ? 'bg-rose-50 ring-1 ring-rose-200' : 'hover:bg-slate-50'}`}>
+                                                        <span className="text-xl font-black italic">{item.p}</span>
+                                                        <p className="text-xs font-medium text-slate-500">{bridge === 'en' ? item.en : item.hi}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     ))}
-                                    {isTyping && <p className="text-[10px] animate-pulse">SENSEI TYPING...</p>}
+                                </div>
+                                <div className="bg-slate-900 text-white p-8 rounded-[2.5rem] h-fit sticky top-24 shadow-2xl">
+                                    <h3 className="text-4xl font-black text-rose-500 italic mb-2">{selectedParticle}</h3>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">{particleDetails[selectedParticle]?.title}</p>
+                                    <p className="text-sm font-medium leading-relaxed mb-6">{bridge === 'en' ? particleDetails[selectedParticle]?.en_logic : particleDetails[selectedParticle]?.hi_logic}</p>
+                                    <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-xs text-slate-300">
+                                        <strong>Multitask:</strong> {particleDetails[selectedParticle]?.multitask}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'numbers' && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in">
+                                <CounterCard icon="box" title="General (-tsu)" items={['hitotsu', 'futatsu', 'mittsu', 'yottsu', 'itsutsu', 'muttsu', 'nanatsu', 'yattsu', 'kokonotsu', 'tooo']} note="Native 1-10." />
+                                <CounterCard icon="users" title="People (-nin)" items={['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★', 'go-nin']} note="Irregulars for 1, 2, 4." />
+                                <CounterCard icon="clock" title="Hours (-ji)" items={['ichi-ji', 'ni-ji', 'yo-ji ★', 'shichi-ji ★', 'ku-ji ★']} note="Watch for 4, 7, 9." />
+                                <CounterCard icon="smartphone" title="Machines (-dai)" items={['ichi-dai', 'ni-dai', 'san-dai']} note="Appliances/Cars." />
+                                <CounterCard icon="file-text" title="Flat (-mai)" items={['ichi-mai', 'ni-mai', 'san-mai']} note="Paper/Shirts." />
+                                <CounterCard icon="dog" title="Animals (-hiki)" items={['ippiki ★', 'ni-hiki', 'san-biki ★']} note="Small Animals." />
+                            </div>
+                        )}
+
+                        {activeTab === 'kosoado' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in">
+                                <div className="lg:col-span-2 bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm">
+                                    <table className="w-full text-left text-sm font-bold">
+                                        <thead className="bg-slate-900 text-white text-[10px] tracking-widest uppercase"><tr className="p-4"><th></th><th className="p-4">KO</th><th className="p-4">SO</th><th className="p-4">A</th><th className="p-4">DO</th></tr></thead>
+                                        <tbody className="divide-y divide-slate-50">
+                                            {Object.keys(kosoData).map(k => (
+                                                <tr key={k} onClick={() => setSelectedKoso(k)} className={`cursor-pointer ${selectedKoso === k ? 'bg-rose-50' : ''}`}>
+                                                    <td className="p-4 uppercase text-[9px] text-slate-400">{k}</td>
+                                                    <td className="p-4">ko{k === 'item' ? 're' : k === 'place' ? 'ko' : 'no'}</td>
+                                                    <td className="p-4">so{k === 'item' ? 're' : k === 'place' ? 'ko' : 'no'}</td>
+                                                    <td className="p-4">a{k === 'item' ? 're' : k === 'place' ? 'soko' : 'no'}</td>
+                                                    <td className="p-4">do{k === 'item' ? 're' : k === 'place' ? 'ko' : 'no'}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="bg-slate-900 text-white p-8 rounded-[2rem] text-center flex flex-col justify-center">
+                                    <h3 className="text-2xl font-black text-rose-500 italic mb-4">{kosoData[selectedKoso].title}</h3>
+                                    <p className="text-lg font-bold mb-4">{bridge === 'en' ? kosoData[selectedKoso].bridgeEn : kosoData[selectedKoso].bridgeHi}</p>
+                                    <p className="text-xs text-slate-400 italic">{kosoData[selectedKoso].tip}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'ai' && (
+                            <div className="max-w-2xl mx-auto h-[600px] bg-white rounded-[3rem] shadow-2xl border border-slate-100 flex flex-col overflow-hidden animate-in">
+                                <div className="flex-1 p-8 overflow-y-auto space-y-4 no-scrollbar bg-[#FAFAFA]/50">
+                                    {chatMessages.map((m, i) => (
+                                        <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                            <div className={`p-4 rounded-2xl text-sm max-w-[85%] whitespace-pre-wrap shadow-sm ${m.role === 'user' ? 'bg-slate-900 text-white' : 'bg-white border text-slate-700'}`}>{m.text}</div>
+                                        </div>
+                                    ))}
+                                    {isTyping && <p className="text-[10px] text-rose-500 font-black animate-pulse ml-2">SENSEI DRAFTING...</p>}
                                     <div ref={chatEndRef} />
                                 </div>
-                                <div className="p-4 border-t flex gap-2">
-                                    <input type="text" value={userInput} onChange={e => setUserInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && askSensei()} className="flex-1 bg-slate-100 rounded-xl px-4 py-3 text-sm outline-none" />
-                                    <button onClick={askSensei} className="bg-rose-500 text-white px-6 py-3 rounded-xl">Send</button>
+                                <div className="p-6 border-t flex gap-3 bg-white">
+                                    <input type="text" value={userInput} onChange={e => setUserInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && askSensei()} className="flex-1 bg-slate-50 rounded-xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-rose-500" placeholder="Ask in Hinglish/English..." />
+                                    <button onClick={askSensei} className="bg-rose-500 text-white p-4 rounded-xl shadow-lg shadow-rose-200">Send</button>
                                 </div>
                             </div>
                         )}
@@ -133,6 +224,20 @@
                 </div>
             );
         };
+
+        const NavBtn = ({ active, onClick, icon, label, color = "text-slate-600" }) => (
+            <button onClick={onClick} className={`flex items-center gap-2 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all ${active ? 'bg-slate-900 text-white shadow-lg' : `${color} hover:bg-slate-100`}`}>
+                <i data-lucide={icon} style={{ width: 14, height: 14 }}></i> {label}
+            </button>
+        );
+
+        const CounterCard = ({ icon, title, items, note }) => (
+            <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-4 flex flex-col">
+                <div className="flex items-center gap-3"><i data-lucide={icon} className="text-rose-500" style={{ width: 20, height: 20 }}></i><h4 className="font-black text-xs uppercase tracking-tight">{title}</h4></div>
+                <div className="flex flex-wrap gap-2">{items.map((it, i) => <span key={i} className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${it.includes('★') ? 'bg-rose-50 text-rose-500 border-rose-100' : 'bg-slate-50 border-slate-100'}`}>{it}</span>)}</div>
+                <p className="mt-auto text-[9px] text-slate-400 italic">Note: {note}</p>
+            </div>
+        );
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
