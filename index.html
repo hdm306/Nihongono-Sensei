@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongono Sensei - Complete</title>
+    <title>Nihongono Sensei</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -57,13 +57,7 @@
                     { p: 'no', label: 'Possession', en: "X's Y.", hi: 'Ka/Ke/Ki (का/के/की)' },
                     { p: 'mo', label: 'Inclusion', en: 'Also / Too.', hi: 'Bhi (भी)' },
                     { p: 'to', label: 'Together', en: 'And / With.', hi: 'Aur / Saath (और)' },
-                    { p: 'soshite', label: 'Connector', en: 'And then.', hi: 'Aur phir (और phir)' }
-                ],
-                "Boundaries": [
-                    { p: 'kara', label: 'From', en: 'Starting point.', hi: 'Se (से)' },
-                    { p: 'made', label: 'Until', en: 'Ending point.', hi: 'Tak (तक)' },
-                    { p: 'goro', label: 'Approx', en: 'Around (time).', hi: 'Ke aas-paas' },
-                    { p: 'dake', label: 'Only', en: 'Exclusively.', hi: 'Sirf (सिर्फ)' }
+                    { p: 'soshite', label: 'Connector', en: 'And then.', hi: 'Aur phir' }
                 ],
                 "Social Enders": [
                     { p: 'ka', label: 'Question', en: 'Ender (?)', hi: 'Kya? (क्या?)' },
@@ -75,27 +69,23 @@
             const particleDetails = {
                 wa: { title: "Topic Marker (は)", en_logic: "Sets the stage. Highlights the main topic.", hi_logic: "Main topic set karta hai. 'As for me...' (Main toh...).", multitask: "Contrast: Used to show difference between two things." },
                 ga: { title: "Subject Marker (が)", en_logic: "Pinpoints the specific actor.", hi_logic: "Specific karta ko point karta hai.", multitask: "Introduces new information." },
-                o: { title: "Object Marker (を)", en_logic: "Marks the direct object.", hi_logic: "Karma (object) ko point karta hai.", multitask: "Used when leaving a place or walking a path." },
-                ni: { title: "Target Marker (に)", en_logic: "Points to a static time or place.", hi_logic: "Sthan ya Samay ko point karta hai.", multitask: "Indicates the indirect object (Give TO friend)." },
-                e: { title: "Directional Marker (へ)", en_logic: "Focuses on the journey direction.", hi_logic: "Disha dikhata hai. 'Ki taraf' jaisa.", multitask: "Nuance: Focuses on the movement, not the destination point." },
-                de: { title: "Context Marker (で)", en_logic: "Where action happens or tool used.", hi_logic: "Kriya kahan ya kisse ho rahi hai.", multitask: "Means 'by means of' (By bus/With spoon/In total)." },
-                mo: { title: "Inclusion Marker (も)", en_logic: "Means 'also' or 'too'.", hi_logic: "Hindi ke 'bhi' (भी) jaisa.", multitask: "Creates 'Everywhere/Everyone' with question words." },
-                no: { title: "Linker (の)", en_logic: "Indicates possession.", hi_logic: "Ka/Ke/Ki (का/के/की).", multitask: "Acts as a placeholder for a noun (The red one)." },
-                kara: { title: "Starting Point (から)", en_logic: "From time or space.", hi_logic: "Shuruat point. 'Se' (से).", multitask: "Reason: When at the end of a clause, it means 'Because'." },
-                made: { title: "Ending Point (まで)", en_logic: "Until or up to.", hi_logic: "Ant point. 'Tak' (तक).", multitask: "Shows extent of action." },
-                goro: { title: "Approx Time (ごろ)", en_logic: "Approximate time point.", hi_logic: "Samay ke aas-paas.", multitask: "Used for points in time only, not duration." },
-                dake: { title: "Exclusion (だけ)", en_logic: "Only / Just.", hi_logic: "Sirf (सिर्फ).", multitask: "Used in positive sentences." },
-                to: { title: "Connector (と)", en_logic: "Means 'and' or 'with'.", hi_logic: "Aur (और) ya Saath (साथ).", multitask: "Used for quoting thoughts or speech." },
-                soshite: { title: "Conjunction (そして)", en_logic: "And then...", hi_logic: "Aur phir (और phir).", multitask: "Formal sentence connector." },
-                ka: { title: "Question Marker (か)", en_logic: "Ender (?)", hi: "Kya? (क्या?)", multitask: "Between nouns, it means 'or'." },
-                ne: { title: "Agreement (ね)", en_logic: "Seeking confirmation. 'Right?'", hi_logic: "Na? (ना?)", multitask: "Softens the tone of the sentence." },
-                yo: { title: "Assertion (よ)", en_logic: "Informing/Emphasizing.", hi_logic: "Bata raha hoon! (Focus point).", multitask: "Used for giving new info to listener." }
+                o: { title: "Object Marker (を)", en_logic: "Marks the direct object.", hi_logic: "Karma (object) ko point karta hai.", multitask: "Used when leaving a place." },
+                ni: { title: "Target Marker (に)", en_logic: "Points to a static time or place.", hi_logic: "Sthan ya Samay ko point karta hai.", multitask: "Indicates indirect object." },
+                e: { title: "Directional Marker (へ)", en_logic: "Directional destination.", hi_logic: "Disha dikhata hai.", multitask: "Focuses on the path." },
+                de: { title: "Context Marker (で)", en_logic: "Where action happens.", hi_logic: "Kriya kahan ho rahi hai.", multitask: "Tool marker (by bus)." },
+                mo: { title: "Inclusion (も)", en_logic: "Also / Too.", hi_logic: "Bhi (भी).", multitask: "Works with 'everyone'." },
+                no: { title: "Linker (の)", en_logic: "Possession.", hi_logic: "Ka/Ke/Ki (का/के/की).", multitask: "Pronoun replacement." },
+                to: { title: "Connector (と)", en_logic: "And / With.", hi_logic: "Aur / Saath.", multitask: "Quotations." },
+                soshite: { title: "Conjunction (そして)", en_logic: "And then.", hi_logic: "Aur phir.", multitask: "Sentence connector." },
+                ka: { title: "Question (か)", en_logic: "Ender (?)", hi_logic: "Kya?", multitask: "Means 'or'." },
+                ne: { title: "Agreement (ね)", en_logic: "Right?", hi_logic: "Na?", multitask: "Softens tone." },
+                yo: { title: "Assertion (よ)", en_logic: "Emphasis.", hi_logic: "Bata raha hoon!", multitask: "New info." }
             };
 
             const kosoData = {
-                item: { title: "Kore / Sore / Are / Dore", bridgeEn: "This / That / That Over There / Which One", bridgeHi: "Yeh / Woh / Woh Door Wala / Kaunsa", tip: "Standalone pronouns. 'Kore wa...' is correct." },
-                place: { title: "Koko / Soko / Asoko / Doko", bridgeEn: "Here / There / Over There / Where", bridgeHi: "Yahan / Wahan / Wahan Door / Kahan", tip: "Locations. 'Asoko' is far from both." },
-                adj: { title: "Kono / Sono / Ano / Dono", bridgeEn: "This [Noun] / That [Noun] / Which [Noun]", bridgeHi: "Yeh [Noun] / Woh [Noun] / Kaunsa [Noun]", tip: "Needs a noun! 'Kono hon'." }
+                item: { title: "Kore / Sore / Are / Dore", bridgeEn: "This / That / That Over There / Which One", bridgeHi: "Yeh / Woh / Woh Door Wala / Kaunsa", tip: "Standalone pronouns." },
+                place: { title: "Koko / Soko / Asoko / Doko", bridgeEn: "Here / There / Over There / Where", bridgeHi: "Yahan / Wahan / Wahan Door / Kahan", tip: "Locations." },
+                adj: { title: "Kono / Sono / Ano / Dono", bridgeEn: "This [Noun] / That [Noun]", bridgeHi: "Yeh [Noun] / Woh [Noun]", tip: "Needs a noun!" }
             };
 
             const askSensei = async () => {
@@ -106,10 +96,10 @@
                 setIsTyping(true);
 
                 const langLogic = bridge === 'hi' 
-                    ? "Respond in bulleted Hinglish. Use line breaks. Match particles to Hindi logic (wa=toh, o=ko, ga=ne, ni=ko/me, de=me/se)."
-                    : "Respond in bulleted English. Separate Translation, Roomaji, and Grammar.";
+                    ? "Respond in short, bulleted Hinglish. Use line breaks. wa=toh, o=ko, ga=ne, ni=ko, de=me/se."
+                    : "Respond in short, bulleted English. Translation, Roomaji, and Grammar.";
 
-                const systemPrompt = `You are Nihongono Sensei. ${langLogic} Focus on particles. Concise only.`;
+                const systemPrompt = `You are Nihongono Sensei. ${langLogic} Focus on particles. Concise. No markdown symbols like asterisks.`;
 
                 try {
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
@@ -120,11 +110,18 @@
                             systemInstruction: { parts: [{ text: systemPrompt }] }
                         })
                     });
+                    
                     const data = await response.json();
-                    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sensei is busy. Try again!";
+                    
+                    if (data.error) {
+                        throw new Error(data.error.message);
+                    }
+
+                    const aiText = data.candidates[0].content.parts[0].text;
                     setChatMessages(prev => [...prev, { role: 'ai', text: aiText }]);
                 } catch (err) {
-                    setChatMessages(prev => [...prev, { role: 'ai', text: "Connection error!" }]);
+                    console.error("API Error:", err);
+                    setChatMessages(prev => [...prev, { role: 'ai', text: "Sensei is busy (API Error). Check if your key is restricted in AI Studio!" }]);
                 } finally { setIsTyping(false); }
             };
 
@@ -165,10 +162,10 @@
                                 </div>
                                 <div className="bg-slate-900 text-white p-8 rounded-[2.5rem] h-fit sticky top-24 shadow-2xl">
                                     <h3 className="text-4xl font-black text-rose-500 italic mb-2">{selectedParticle}</h3>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">{particleDetails[selectedParticle].title}</p>
-                                    <p className="text-sm font-medium leading-relaxed mb-6">{bridge === 'en' ? particleDetails[selectedParticle].en_logic : particleDetails[selectedParticle].hi_logic}</p>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">{particleDetails[selectedParticle]?.title}</p>
+                                    <p className="text-sm font-medium leading-relaxed mb-6">{bridge === 'en' ? particleDetails[selectedParticle]?.en_logic : particleDetails[selectedParticle]?.hi_logic}</p>
                                     <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-xs text-slate-300">
-                                        <strong>Multitask:</strong> {particleDetails[selectedParticle].multitask}
+                                        <strong>Multitask:</strong> {particleDetails[selectedParticle]?.multitask}
                                     </div>
                                 </div>
                             </div>
