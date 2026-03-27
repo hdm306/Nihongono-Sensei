@@ -3,118 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongono Sensei</title>
+    <title>Nihongono Sensei | Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </script>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #F8FAFC; }
+    </style>
 </head>
-<body class="bg-[#F8FAFC]">
-    <div id="root"></div>
+<body>
+    <div id="root">
+        <div style="padding: 40px; text-align: center; color: #64748b;">
+            <h2 style="font-weight: 900;">Loading Nihongono Sensei...</h2>
+            <p>If this screen stays blank for more than 5 seconds, please check your internet connection or try a different browser (Chrome/Edge recommended).</p>
+        </div>
+    </div>
 
     <script type="text/babel">
-        const { useState } = React;
+        // This is a safety check to make sure React is ready
+        try {
+            const { useState } = React;
 
-        const App = () => {
-            const [activeTab, setActiveTab] = useState('particles');
-            const [bridge, setBridge] = useState('en'); 
-            const [selectedParticle, setSelectedParticle] = useState(null);
+            const App = () => {
+                const [activeTab, setActiveTab] = useState('particles');
+                const [bridge, setBridge] = useState('en');
+                const [selected, setSelected] = useState(null);
 
-            const particleGroups = {
-                "The Big Three": [
-                    { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...' },
-                    { p: 'ga', label: 'Subject', en: 'The specific actor.', hi: 'Karta (ne - ने)' },
-                    { p: 'o', label: 'Object', en: 'The target of action.', hi: 'Karma (ko - को)' }
-                ],
-                "Movement": [
-                    { p: 'ni', label: 'Target', en: 'At (time) / To (place).', hi: 'Sthan/Samay' },
-                    { p: 'e', label: 'Direction', en: 'Towards.', hi: 'Ki taraf' },
-                    { p: 'de', label: 'Active Loc', en: 'At (location).', hi: 'Me/Se' }
-                ]
-            };
+                const data = {
+                    particles: [
+                        { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...' },
+                        { p: 'ga', label: 'Subject', en: 'The specific actor.', hi: 'Karta (ne - ने)' },
+                        { p: 'o', label: 'Object', en: 'The target.', hi: 'Karma (ko - को)' }
+                    ]
+                };
 
-            const particleDetails = {
-                wa: { title: "Topic (は)", logic: bridge === 'en' ? "Sets the stage. Highlights what you are talking about." : "Main topic set karta hai. 'Main toh...'" },
-                ga: { title: "Subject (が)", logic: bridge === 'en' ? "Pinpoints the specific actor or focus." : "Specific karta ko point karta hai." },
-                o: { title: "Object (を)", logic: bridge === 'en' ? "Marks the direct object of a verb." : "Hindi ke 'ko' (को) jaisa." }
-            };
+                return (
+                    <div className="min-h-screen pb-24">
+                        {/* Header */}
+                        <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+                            <h1 className="text-xl font-black italic tracking-tighter">Nihongono <span className="text-rose-500">Sensei</span></h1>
+                            <div className="flex bg-slate-100 p-1 rounded-xl gap-1">
+                                <button onClick={() => setBridge('en')} className={`px-4 py-1 rounded-lg text-[10px] font-black ${bridge === 'en' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-400'}`}>EN</button>
+                                <button onClick={() => setBridge('hi')} className={`px-4 py-1 rounded-lg text-[10px] font-black ${bridge === 'hi' ? 'bg-white shadow-sm text-rose-500' : 'text-slate-400'}`}>HI</button>
+                            </div>
+                        </header>
 
-            return (
-                <div className="min-h-screen pb-20">
-                    {/* Header */}
-                    <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
-                        <h1 className="text-xl font-black tracking-tighter italic text-slate-900">Nihongono <span className="text-rose-500">Sensei</span></h1>
-                        <div className="flex gap-1 p-1 bg-slate-100 rounded-xl">
-                            <button onClick={() => setBridge('en')} className={`px-4 py-1 rounded-lg text-[10px] font-black transition-all ${bridge === 'en' ? 'bg-white shadow-sm' : 'text-slate-400'}`}>EN</button>
-                            <button onClick={() => setBridge('hi')} className={`px-4 py-1 rounded-lg text-[10px] font-black transition-all ${bridge === 'hi' ? 'bg-white text-rose-500 shadow-sm' : 'text-slate-400'}`}>HI</button>
-                        </div>
-                    </nav>
-
-                    {/* Content */}
-                    <div className="max-w-4xl mx-auto p-6 space-y-10">
-                        {activeTab === 'particles' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {Object.entries(particleGroups).map(([group, items], i) => (
-                                    <div key={i} className="space-y-4">
-                                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">{group}</h3>
-                                        {items.map((item, j) => (
-                                            <button 
-                                                key={j} 
-                                                onClick={() => setSelectedParticle(item.p)}
-                                                className="w-full bg-white p-5 rounded-3xl border border-slate-200 shadow-sm hover:border-rose-400 hover:shadow-md transition-all flex items-center gap-4 text-left group"
-                                            >
-                                                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-xl font-black italic text-slate-900 group-hover:text-rose-500">{item.p}</div>
-                                                <div>
-                                                    <p className="text-[9px] font-black text-rose-400 uppercase">{item.label}</p>
-                                                    <p className="text-sm font-bold text-slate-600 truncate">{bridge === 'en' ? item.en : item.hi}</p>
-                                                </div>
-                                            </button>
-                                        ))}
+                        {/* Content */}
+                        <main className="max-w-md mx-auto p-6 space-y-4">
+                            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Essential Particles</h2>
+                            {data.particles.map((item, i) => (
+                                <button key={i} onClick={() => setSelected(item)} className="w-full bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm flex items-center gap-4 text-left hover:border-rose-400 transition-all active:scale-95">
+                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-xl font-black italic text-slate-900">{item.p}</div>
+                                    <div>
+                                        <p className="text-[9px] font-black text-rose-400 uppercase">{item.label}</p>
+                                        <p className="text-sm font-bold text-slate-600">{bridge === 'en' ? item.en : item.hi}</p>
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                </button>
+                            ))}
+                        </main>
 
-                        {activeTab === 'verbs' && (
-                            <div className="text-center py-20">
-                                <span className="material-icons text-slate-200 text-6xl mb-4">construction</span>
-                                <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Verbs Section Coming Soon</p>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Modal */}
-                    {selectedParticle && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedParticle(null)}></div>
-                            <div className="relative bg-white w-full max-w-sm rounded-[3rem] p-10 shadow-2xl scale-in duration-300">
-                                <button onClick={() => setSelectedParticle(null)} className="absolute top-8 right-8 text-slate-300 hover:text-slate-900"><span className="material-icons">close</span></button>
-                                <div className="text-7xl font-black italic text-rose-500 mb-4">{selectedParticle}</div>
-                                <h4 className="text-xl font-black text-slate-900 mb-4">{particleDetails[selectedParticle]?.title || "Particle Details"}</h4>
-                                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <p className="text-sm font-bold text-slate-700 leading-relaxed">{particleDetails[selectedParticle]?.logic || "Logic details coming soon."}</p>
+                        {/* Simple Modal */}
+                        {selected && (
+                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelected(null)}>
+                                <div className="bg-white w-full max-w-sm rounded-[3rem] p-10 shadow-2xl relative" onClick={e => e.stopPropagation()}>
+                                    <div className="text-6xl font-black italic text-rose-500 mb-2">{selected.p}</div>
+                                    <h4 className="text-xl font-black text-slate-900 mb-4">{selected.label}</h4>
+                                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 text-sm font-bold text-slate-600 leading-relaxed">
+                                        {bridge === 'en' ? "Logic: This particle helps you identify the " + selected.label : "Logic: Yeh particle aapko " + selected.label + " pehchanne mein madad karta hai."}
+                                    </div>
+                                    <button onClick={() => setSelected(null)} className="mt-6 w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest">Close</button>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Bottom Nav */}
-                    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 px-10 py-4 rounded-full shadow-2xl flex gap-12 z-50">
-                        <button onClick={() => setActiveTab('particles')} className={`transition-all ${activeTab === 'particles' ? 'text-rose-500 scale-125' : 'text-slate-500'}`}><span className="material-icons">layers</span></button>
-                        <button onClick={() => setActiveTab('verbs')} className={`transition-all ${activeTab === 'verbs' ? 'text-rose-500 scale-125' : 'text-slate-500'}`}><span className="material-icons">zap</span></button>
+                        {/* Nav */}
+                        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 px-10 py-4 rounded-full shadow-2xl flex gap-12 text-slate-500">
+                            <button className="text-rose-500"><span className="material-icons">layers</span></button>
+                            <button className="hover:text-white" onClick={() => alert('Verbs coming soon!')}><span className="material-icons">zap</span></button>
+                        </nav>
                     </div>
-                </div>
-            );
-        };
+                );
+            };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(<App />);
+        } catch (err) {
+            document.getElementById('root').innerHTML = `<div style="padding:20px; color:red; font-family:sans-serif;"><b>Error:</b> ${err.message}</div>`;
+        }
     </script>
 </body>
 </html>
