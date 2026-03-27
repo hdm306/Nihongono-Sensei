@@ -3,96 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongono Sensei | Lab</title>
+    <title>Nihongono Sensei | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background: #F8FAFC; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
-    <div id="root">
-        <div style="padding: 40px; text-align: center; color: #64748b;">
-            <h2 style="font-weight: 900;">Loading Nihongono Sensei...</h2>
-            <p>If this screen stays blank for more than 5 seconds, please check your internet connection or try a different browser (Chrome/Edge recommended).</p>
-        </div>
-    </div>
+    <div id="root"></div>
 
     <script type="text/babel">
-        // This is a safety check to make sure React is ready
-        try {
-            const { useState } = React;
+        const { useState } = React;
 
-            const App = () => {
-                const [activeTab, setActiveTab] = useState('particles');
-                const [bridge, setBridge] = useState('en');
-                const [selected, setSelected] = useState(null);
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('particles');
+            const [bridge, setBridge] = useState('en');
+            const [selected, setSelected] = useState(null);
 
-                const data = {
-                    particles: [
-                        { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...' },
-                        { p: 'ga', label: 'Subject', en: 'The specific actor.', hi: 'Karta (ne - ने)' },
-                        { p: 'o', label: 'Object', en: 'The target.', hi: 'Karma (ko - को)' }
-                    ]
-                };
+            const particles = [
+                { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...', logic: 'Sets the main topic of your sentence.' },
+                { p: 'ga', label: 'Subject', en: 'The specific actor.', hi: 'Karta (ne - ने)', logic: 'Identifies who is performing the action.' },
+                { p: 'o', label: 'Object', en: 'The target.', hi: 'Karma (ko - को)', logic: 'The thing being acted upon.' },
+                { p: 'ni', label: 'Target/Time', en: 'At / To', hi: 'Sthan/Samay', logic: 'Points to a specific time or a destination.' },
+                { p: 'de', label: 'Location', en: 'Action place', hi: 'Kriya sthan', logic: 'Where the action is happening.' },
+                { p: 'no', label: 'Possession', en: "X's Y", hi: 'Ka/Ke/Ki', logic: 'Connects two nouns (e.g., My book).' }
+            ];
 
-                return (
-                    <div className="min-h-screen pb-24">
-                        {/* Header */}
-                        <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-                            <h1 className="text-xl font-black italic tracking-tighter">Nihongono <span className="text-rose-500">Sensei</span></h1>
-                            <div className="flex bg-slate-100 p-1 rounded-xl gap-1">
-                                <button onClick={() => setBridge('en')} className={`px-4 py-1 rounded-lg text-[10px] font-black ${bridge === 'en' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-400'}`}>EN</button>
-                                <button onClick={() => setBridge('hi')} className={`px-4 py-1 rounded-lg text-[10px] font-black ${bridge === 'hi' ? 'bg-white shadow-sm text-rose-500' : 'text-slate-400'}`}>HI</button>
+            const counters = [
+                { title: 'General (-tsu)', items: ['hitotsu', 'futatsu', 'mittsu', 'yottsu', 'itsutsu', 'muttsu', 'nanatsu', 'yattsu', 'kokonotsu', 'tooo'] },
+                { title: 'People (-nin)', items: ['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★', 'go-nin', 'roku-nin', 'shichi-nin'] },
+                { title: 'Time (-ji)', items: ['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji'] }
+            ];
+
+            const verbs = [
+                { dict: 'Iku', polite: 'Ikimasu', group: 'G1', en: 'Go', hi: 'Jaana', ex: 'Gakkou ni ikimasu.' },
+                { dict: 'Nomu', polite: 'Nomimasu', group: 'G1', en: 'Drink', hi: 'Peena', ex: 'Mizu o nomimasu.' },
+                { dict: 'Taberu', polite: 'Tabemasu', group: 'G2', en: 'Eat', hi: 'Khana', ex: 'Ranchi o tabemasu.' },
+                { dict: 'Miru', polite: 'Mimasu', group: 'G2', en: 'See', hi: 'Dekhna', ex: 'Terebi o mimasu.' },
+                { dict: 'Suru', polite: 'Shimasu', group: 'G3', en: 'Do', hi: 'Karna', ex: 'Benkyou o shimasu.' },
+                { dict: 'Kuru', polite: 'Kimasu', group: 'G3', en: 'Come', hi: 'Aana', ex: 'Tomodachi ga kimasu.' }
+            ];
+
+            return (
+                <div className="min-h-screen flex flex-col lg:flex-row">
+                    
+                    {/* DESKTOP SIDEBAR */}
+                    <aside className="hidden lg:flex w-24 bg-slate-950 flex-col items-center py-10 gap-10 fixed h-full z-50">
+                        <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg shadow-rose-500/20 text-xl">N</div>
+                        <nav className="flex flex-col gap-8">
+                            <SidebarBtn active={activeTab === 'particles'} icon="layers" onClick={() => setActiveTab('particles')} />
+                            <SidebarBtn active={activeTab === 'numbers'} icon="tag" onClick={() => setActiveTab('numbers')} />
+                            <SidebarBtn active={activeTab === 'verbs'} icon="bolt" onClick={() => setActiveTab('verbs')} />
+                        </nav>
+                    </aside>
+
+                    {/* MAIN AREA */}
+                    <main className="flex-1 lg:ml-24 pb-24 lg:pb-10">
+                        
+                        {/* HEADER */}
+                        <header className="sticky top-0 z-40 glass border-b border-slate-100 px-6 lg:px-12 py-6 flex justify-between items-center">
+                            <div>
+                                <h1 className="text-xl lg:text-2xl font-extrabold tracking-tighter text-slate-900 italic uppercase leading-none">Nihongono <span className="text-rose-500 underline decoration-rose-200 underline-offset-4">Sensei</span></h1>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">By Japa & Himanshu</p>
+                            </div>
+                            
+                            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                                <button onClick={() => setBridge('en')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'en' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}>EN</button>
+                                <button onClick={() => setBridge('hi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'hi' ? 'bg-white shadow-md text-rose-500' : 'text-slate-400'}`}>HI</button>
                             </div>
                         </header>
 
-                        {/* Content */}
-                        <main className="max-w-md mx-auto p-6 space-y-4">
-                            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Essential Particles</h2>
-                            {data.particles.map((item, i) => (
-                                <button key={i} onClick={() => setSelected(item)} className="w-full bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm flex items-center gap-4 text-left hover:border-rose-400 transition-all active:scale-95">
-                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-xl font-black italic text-slate-900">{item.p}</div>
-                                    <div>
-                                        <p className="text-[9px] font-black text-rose-400 uppercase">{item.label}</p>
-                                        <p className="text-sm font-bold text-slate-600">{bridge === 'en' ? item.en : item.hi}</p>
-                                    </div>
-                                </button>
-                            ))}
-                        </main>
+                        {/* MOBILE SUB-NAV */}
+                        <div className="lg:hidden flex overflow-x-auto no-scrollbar gap-2 p-4 bg-white border-b border-slate-100 sticky top-[81px] z-30">
+                            <TabBtn active={activeTab === 'particles'} label="Particles" onClick={() => setActiveTab('particles')} />
+                            <TabBtn active={activeTab === 'numbers'} label="Numbers" onClick={() => setActiveTab('numbers')} />
+                            <TabBtn active={activeTab === 'verbs'} label="Verbs" onClick={() => setActiveTab('verbs')} />
+                        </div>
 
-                        {/* Simple Modal */}
-                        {selected && (
-                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelected(null)}>
-                                <div className="bg-white w-full max-w-sm rounded-[3rem] p-10 shadow-2xl relative" onClick={e => e.stopPropagation()}>
-                                    <div className="text-6xl font-black italic text-rose-500 mb-2">{selected.p}</div>
-                                    <h4 className="text-xl font-black text-slate-900 mb-4">{selected.label}</h4>
-                                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 text-sm font-bold text-slate-600 leading-relaxed">
-                                        {bridge === 'en' ? "Logic: This particle helps you identify the " + selected.label : "Logic: Yeh particle aapko " + selected.label + " pehchanne mein madad karta hai."}
+                        <div className="max-w-7xl mx-auto p-6 lg:p-12">
+                            
+                            {/* PARTICLES GRID */}
+                            {activeTab === 'particles' && (
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <SectionHeader title="Essential Particles" sub="The Logic of Japanese Sentences" />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {particles.map((item, i) => (
+                                            <Card key={i} item={item} bridge={bridge} onClick={() => setSelected({type: 'particle', data: item})} />
+                                        ))}
                                     </div>
-                                    <button onClick={() => setSelected(null)} className="mt-6 w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest">Close</button>
                                 </div>
+                            )}
+
+                            {/* NUMBERS VIEW */}
+                            {activeTab === 'numbers' && (
+                                <div className="animate-in fade-in duration-500">
+                                    <SectionHeader title="Counting & Time" sub="Special Japanese Counters" />
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                        {counters.map((group, i) => (
+                                            <div key={i} className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
+                                                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6">{group.title}</h3>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {group.items.map((it, j) => (
+                                                        <span key={j} className={`px-4 py-2 rounded-xl text-xs font-bold italic border ${it.includes('★') ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-slate-50 border-slate-100 text-slate-600'}`}>{it}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* VERBS VIEW */}
+                            {activeTab === 'verbs' && (
+                                <div className="animate-in fade-in duration-500">
+                                    <SectionHeader title="Mastering Verbs" sub="Action Words & Conjugation" />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {verbs.map((v, i) => (
+                                            <button key={i} onClick={() => setSelected({type: 'verb', data: v})} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left flex flex-col justify-between h-52 overflow-hidden relative">
+                                                <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-bl-full -mr-8 -mt-8 group-hover:bg-rose-50 transition-colors"></div>
+                                                <div className="relative z-10">
+                                                    <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{v.group}</span>
+                                                    <h3 className="text-4xl font-black text-slate-900 italic group-hover:text-rose-600 transition-colors">{v.dict}</h3>
+                                                </div>
+                                                <div className="relative z-10">
+                                                    <p className="text-slate-500 font-bold text-sm uppercase">{bridge === 'en' ? v.en : v.hi}</p>
+                                                    <p className="text-[10px] text-slate-300 font-bold mt-1 tracking-widest uppercase">Click to Conjugate</p>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+
+                    {/* MODAL SYSTEM */}
+                    {selected && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                            <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setSelected(null)}></div>
+                            <div className="relative bg-white w-full max-w-xl rounded-[3.5rem] p-10 lg:p-14 shadow-2xl animate-in zoom-in-95 duration-300">
+                                <button onClick={() => setSelected(null)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-900 transition-colors"><span className="material-icons text-3xl">close</span></button>
+                                
+                                {selected.type === 'particle' && (
+                                    <div className="space-y-8">
+                                        <div className="flex items-center gap-8">
+                                            <div className="text-8xl font-black italic text-rose-500">{selected.data.p}</div>
+                                            <div>
+                                                <h4 className="text-2xl font-black text-slate-900 italic uppercase leading-tight">{selected.data.label}</h4>
+                                                <p className="text-slate-400 font-bold uppercase text-xs tracking-widest mt-1">Particle Guide</p>
+                                            </div>
+                                        </div>
+                                        <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100">
+                                            <p className="text-xl font-bold text-slate-700 leading-relaxed italic">"{selected.data.logic}"</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {selected.type === 'verb' && (
+                                    <div className="space-y-8 text-center lg:text-left">
+                                        <div>
+                                            <h4 className="text-6xl font-black text-rose-500 italic leading-none">{selected.data.dict}</h4>
+                                            <p className="text-slate-400 font-black uppercase text-xs tracking-[0.3em] mt-4">Dictionary Form</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="p-6 bg-slate-950 text-white rounded-3xl">
+                                                <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-1">Polite Form</p>
+                                                <p className="text-xl font-bold italic">{selected.data.polite}</p>
+                                            </div>
+                                            <div className="p-6 bg-rose-50 rounded-3xl border border-rose-100">
+                                                <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Meaning</p>
+                                                <p className="text-xl font-bold italic text-rose-900">{bridge === 'en' ? selected.data.en : selected.data.hi}</p>
+                                            </div>
+                                        </div>
+                                        <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Example Sentence</p>
+                                            <p className="text-2xl font-black text-slate-800 italic">"{selected.data.ex}"</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        {/* Nav */}
-                        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 px-10 py-4 rounded-full shadow-2xl flex gap-12 text-slate-500">
-                            <button className="text-rose-500"><span className="material-icons">layers</span></button>
-                            <button className="hover:text-white" onClick={() => alert('Verbs coming soon!')}><span className="material-icons">zap</span></button>
-                        </nav>
-                    </div>
-                );
-            };
+                    {/* MOBILE NAV BOTTOM */}
+                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-950 px-10 py-5 rounded-full shadow-2xl flex gap-12 lg:hidden z-50">
+                        <MobileBtn active={activeTab === 'particles'} icon="layers" onClick={() => setActiveTab('particles')} />
+                        <MobileBtn active={activeTab === 'numbers'} icon="tag" onClick={() => setActiveTab('numbers')} />
+                        <MobileBtn active={activeTab === 'verbs'} icon="bolt" onClick={() => setActiveTab('verbs')} />
+                    </nav>
 
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            root.render(<App />);
-        } catch (err) {
-            document.getElementById('root').innerHTML = `<div style="padding:20px; color:red; font-family:sans-serif;"><b>Error:</b> ${err.message}</div>`;
-        }
+                </div>
+            );
+        };
+
+        // --- SUB COMPONENTS ---
+        const Card = ({ item, bridge, onClick }) => (
+            <button onClick={onClick} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left flex flex-col justify-between h-52 relative overflow-hidden">
+                <div className="absolute -right-4 -top-4 text-slate-50 group-hover:text-rose-50 transition-colors pointer-events-none font-black text-8xl italic uppercase leading-none">{item.p}</div>
+                <div className="relative z-10">
+                    <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">{item.label}</p>
+                    <h3 className="text-4xl font-black text-slate-900 italic group-hover:text-rose-600 transition-colors uppercase">{item.p}</h3>
+                </div>
+                <p className="text-slate-500 font-bold text-sm relative z-10">{bridge === 'en' ? item.en : item.hi}</p>
+            </button>
+        );
+
+        const SectionHeader = ({ title, sub }) => (
+            <div className="mb-10 text-center lg:text-left">
+                <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight italic uppercase">{title}</h2>
+                <p className="text-slate-400 font-bold text-[10px] lg:text-xs uppercase tracking-[0.3em] mt-2">{sub}</p>
+            </div>
+        );
+
+        const SidebarBtn = ({ active, icon, onClick }) => (
+            <button onClick={onClick} className={`p-4 rounded-2xl transition-all duration-300 ${active ? 'bg-rose-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>
+                <span className="material-icons text-3xl">{icon}</span>
+            </button>
+        );
+
+        const MobileBtn = ({ active, icon, onClick }) => (
+            <button onClick={onClick} className={`transition-all duration-300 ${active ? 'text-rose-500 scale-125' : 'text-slate-500'}`}>
+                <span className="material-icons text-2xl">{icon}</span>
+            </button>
+        );
+
+        const TabBtn = ({ active, label, onClick }) => (
+            <button onClick={onClick} className={`px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shrink-0 ${active ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-400'}`}>{label}</button>
+        );
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
