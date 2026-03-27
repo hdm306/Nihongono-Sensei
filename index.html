@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  BookOpen, Hash, Map, Layers, Zap, Box, Users, Clock, 
-  X, ChevronRight, PlayCircle, Info 
+  Hash, Map, Layers, Zap, Box, Users, Clock, 
+  X, ChevronRight, PlayCircle, Info, Globe, Sparkles
 } from 'lucide-react';
 
 const App = () => {
@@ -15,6 +15,7 @@ const App = () => {
   const [isVerbModalOpen, setIsVerbModalOpen] = useState(false);
   const [selectedVerbGroup, setSelectedVerbGroup] = useState('g1');
 
+  // --- DATA ENGINE ---
   const particleGroups = {
     "The Big Three": [
       { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...' },
@@ -29,211 +30,240 @@ const App = () => {
     "Relationships": [
       { p: 'no', label: 'Possession', en: "X's Y.", hi: 'Ka/Ke/Ki (का/के/की)' },
       { p: 'mo', label: 'Inclusion', en: 'Also / Too.', hi: 'Bhi (भी)' },
-      { p: 'to', label: 'Together', en: 'And / With.', hi: 'Aur / Saath (और)' },
-      { p: 'soshite', label: 'Connector', en: 'And then.', hi: 'Aur phir (और फिर)' }
+      { p: 'to', label: 'Together', en: 'And / With.', hi: 'Aur / Saath (और)' }
     ]
   };
 
   const verbGroups = {
-    g1: {
-      title: "Group 1 (Godan)",
-      verbs: [
-        { dict: "Iku", polite: "Ikimasu", en: "Go", hi: "Jaana", rel_en: "Similar to 'Go'. Used with 'ni' or 'e'.", rel_hi: "Jaise 'Jaana'. Sentence ke end mein aata hai.", ex: "Gakkou ni ikimasu." },
-        { dict: "Nomu", polite: "Nomimasu", en: "Drink", hi: "Peena", rel_en: "To consume liquids.", rel_hi: "Liquid peene ke liye. Coffee o nomimasu.", ex: "Mizu o nomimasu." },
-        { dict: "Hanasu", polite: "Hanashimasu", en: "Speak", hi: "Bolna", rel_en: "Used for speaking languages or chatting.", rel_hi: "Bhasha bolne ke liye. Nihongo o hanashimasu.", ex: "Tomodachi to hanashimasu." },
-        { dict: "Kau", polite: "Kaimasu", en: "Buy", hi: "Khareedna", rel_en: "Standard word for purchasing items.", rel_hi: "Shopping ke liye useful verb.", ex: "Hon o kaimasu." }
-      ]
-    },
-    g2: {
-      title: "Group 2 (Ichidan)",
-      verbs: [
-        { dict: "Taberu", polite: "Tabemasu", en: "Eat", hi: "Khana", rel_en: "To eat food.", rel_hi: "Khana khane ke liye.", ex: "Ranchi o tabemasu." },
-        { dict: "Miru", polite: "Mimasu", en: "See/Watch", hi: "Dekhna", rel_en: "Used for movies, TV, or simply looking.", rel_hi: "TV dekhna ya kisi ko dekhna.", ex: "Terebi o mimasu." },
-        { dict: "Okiru", polite: "Okimasu", en: "Wake Up", hi: "Uthna", rel_en: "To get out of bed.", rel_hi: "Subah neend se uthna.", ex: "Rokuji ni okimasu." },
-        { dict: "Neru", polite: "Nemasu", en: "Sleep", hi: "Sona", rel_en: "To go to bed.", rel_hi: "Raat ko sone ke liye.", ex: "Juuji ni nemasu." }
-      ]
-    },
-    g3: {
-      title: "Group 3 (Irregular)",
-      verbs: [
-        { dict: "Suru", polite: "Shimasu", en: "Do", hi: "Karna", rel_en: "Used for actions.", rel_hi: "Action ke liye.", ex: "Benkyou o shimasu." },
-        { dict: "Kuru", polite: "Kimasu", en: "Come", hi: "Aana", rel_en: "To move toward the speaker.", rel_hi: "Kisi ka aana.", ex: "Tomodachi ga kimasu." }
-      ]
-    }
+    g1: { title: "Group 1", sub: "Godan (u → i)", verbs: [
+      { dict: "Iku", polite: "Ikimasu", en: "Go", hi: "Jaana", rel: "Movement", ex: "Gakkou ni ikimasu." },
+      { dict: "Nomu", polite: "Nomimasu", en: "Drink", hi: "Peena", rel: "Consumption", ex: "Mizu o nomimasu." },
+      { dict: "Hanasu", polite: "Hanashimasu", en: "Speak", hi: "Bolna", rel: "Social", ex: "Nihongo o hanashimasu." }
+    ]},
+    g2: { title: "Group 2", sub: "Ichidan (iru/eru)", verbs: [
+      { dict: "Taberu", polite: "Tabemasu", en: "Eat", hi: "Khana", rel: "Daily", ex: "Ranchi o tabemasu." },
+      { dict: "Miru", polite: "Mimasu", en: "See", hi: "Dekhna", rel: "Visual", ex: "Terebi o mimasu." }
+    ]},
+    g3: { title: "Group 3", sub: "Irregular", verbs: [
+      { dict: "Suru", polite: "Shimasu", en: "Do", hi: "Karna", rel: "Action", ex: "Benkyou o shimasu." },
+      { dict: "Kuru", polite: "Kimasu", en: "Come", hi: "Aana", rel: "Movement", ex: "Tomodachi ga kimasu." }
+    ]}
   };
 
   const particleDetails = {
-    wa: { title: "Topic Marker (は)", en_logic: "Sets the stage. Highlights what you are talking about.", hi_logic: "Main topic set karta hai. 'Main toh...'", multitask: "Contrast: Highlights differences." },
-    ga: { title: "Subject Marker (が)", en_logic: "Pinpoints the specific actor or focus.", hi_logic: "Specific karta ko point karta hai.", multitask: "New Info: Introduces new subjects." },
-    o: { title: "Object Marker (を)", en_logic: "Marks the direct object of a verb.", hi_logic: "Karma ko point karta hai.", multitask: "Exiting: Used for leaving places (Deru)." },
-    ni: { title: "Target Marker (に)", en_logic: "Points to a static time or destination.", hi_logic: "Sthan ya Samay.", multitask: "Indirect: Marks the receiver." },
-    de: { title: "Context Marker (で)", en_logic: "Marks where an action happens or the tool.", hi_logic: "Kriya kahan ho rahi hai.", multitask: "Total: Can indicate a total number." },
-    mo: { title: "Inclusion Marker (も)", en_logic: "Means 'also' or 'too'.", hi_logic: "Hindi ke 'bhi' jaisa.", multitask: "Emphasis: Creates words like 'Everywhere'." },
-    no: { title: "Linker (の)", en_logic: "Indicates possession or connects nouns.", hi_logic: "Sambandh. 'Ka/Ke/Ki'.", multitask: "Substitution: Acts as 'one'." },
-    kara: { title: "Starting Point (から)", en_logic: "Means 'from' in time or space.", hi_logic: "Shuruat. 'Se'.", multitask: "Reason: Means 'Because' at end of sentence." },
-    to: { title: "Connector (と)", en_logic: "Means 'and' or 'with'.", hi_logic: "Aur ya Saath.", multitask: "Quotations: Marks thoughts or speech." },
-    soshite: { title: "Conjunction (そして)", en_logic: "Formal connector: 'and then'.", hi: "Aur phir.", multitask: "Sequence: Links distinct events." }
+    wa: { title: "Topic (は)", en_logic: "Sets the stage. Highlights what you are talking about.", hi_logic: "Main topic set karta hai.", multitask: "Contrast: Use it to show differences between two things." },
+    ga: { title: "Subject (が)", en_logic: "Pinpoints the specific actor.", hi_logic: "Karta ko point karta hai.", multitask: "New Info: Used when introducing someone for the first time." },
+    o: { title: "Object (を)", en_logic: "The target of a verb.", hi_logic: "Karma (Hindi 'ko').", multitask: "Exiting: Used when leaving a place." },
+    ni: { title: "Target (に)", en_logic: "Specific time or destination.", hi_logic: "Sthan ya Samay.", multitask: "Frequency: Used for 'twice a week' patterns." },
+    de: { title: "Context (で)", en_logic: "Location of action or tool used.", hi_logic: "Kriya kahan ho rahi hai.", multitask: "Total: 'In total' or 'within' a time frame." },
+    mo: { title: "Also (も)", en_logic: "Means 'also' or 'too'.", hi_logic: "Hindi 'bhi'.", multitask: "Emphasis: Can mean 'as many as' with numbers." },
+    no: { title: "Linker (の)", en_logic: "Connects two nouns.", hi_logic: "Ka / Ke / Ki.", multitask: "Pronoun: Can act as 'mine' or 'the red one'." },
+    to: { title: "And/With (と)", en_logic: "A complete list or 'together with'.", hi_logic: "Aur ya Saath.", multitask: "Quotes: Used before 'omou' (think) or 'iu' (say)." }
   };
 
   const kosoData = {
-    item: { title: "Pronouns (物)", row: ["kore", "sore", "are", "dore"], bridgeEn: "This / That / That Far / Which One", bridgeHi: "Yeh / Woh / Woh Door / Kaunsa", tip: "Standalone pronouns." },
-    place: { title: "Locations (場所)", row: ["koko", "soko", "asoko", "doko"], bridgeEn: "Here / There / Over There / Where", bridgeHi: "Yahan / Wahan / Wahan Door / Kahan", tip: "Specific locations in space." },
-    adj: { title: "Adjectives (連体)", row: ["kono", "sono", "ano", "dono"], bridgeEn: "This [X] / That [X] / That Far [X] / Which [X]", bridgeHi: "Yeh [X] / Woh [X] / Woh Door [X] / Kaunsa [X]", tip: "These MUST be followed by a noun." },
-    dir: { title: "Directions (方向)", row: ["kochira", "sochira", "achira", "dochira"], bridgeEn: "This way / That way / That Far Way / Which way", bridgeHi: "Is Taraf / Us Taraf / Us Door Taraf / Kis Taraf", tip: "Polite/Directional formal terms." }
+    item: { title: "Pronouns", row: ["kore", "sore", "are", "dore"], en: "This/That/Far/Which", hi: "Yeh/Woh/Door/Kaunsa", tip: "Standalone words." },
+    place: { title: "Locations", row: ["koko", "soko", "asoko", "doko"], en: "Here/There/Over/Where", hi: "Yahan/Wahan/Door/Kahan", tip: "Physical spots." },
+    adj: { title: "Adjectives", row: ["kono", "sono", "ano", "dono"], en: "This [X] / That [X]", hi: "Yeh [X] / Woh [X]", tip: "Must have a noun after." }
   };
 
+  // --- UI COMPONENTS ---
   return (
-    <div className="min-h-screen bg-[#FDFCFD] text-slate-900 pb-24 font-sans selection:bg-rose-100 overflow-x-hidden">
-      {/* HEADER */}
-      <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-100 px-6 py-4 flex items-center justify-between shadow-sm">
-        <h1 className="text-xl font-black tracking-tighter">Nihongono <span className="text-rose-500">Sensei</span></h1>
-        <div className="flex gap-1 p-1 bg-slate-50 rounded-lg border border-slate-100">
-            <button onClick={() => setBridge('en')} className={`text-[9px] font-bold px-3 py-1 rounded transition-all ${bridge === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}>EN</button>
-            <button onClick={() => setBridge('hi')} className={`text-[9px] font-bold px-3 py-1 rounded transition-all ${bridge === 'hi' ? 'bg-white text-rose-500 shadow-sm' : 'text-slate-400'}`}>HI</button>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-rose-100">
+      
+      {/* SIDEBAR (Desktop) */}
+      <aside className="fixed left-0 top-0 h-full w-20 bg-slate-900 hidden lg:flex flex-col items-center py-8 gap-10 z-50">
+        <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-rose-500/30">N</div>
+        <nav className="flex flex-col gap-6">
+          <SidebarIcon active={activeTab === 'particles'} onClick={() => setActiveTab('particles')} icon={<Layers size={22}/>} />
+          <SidebarIcon active={activeTab === 'numbers'} onClick={() => setActiveTab('numbers')} icon={<Hash size={22}/>} />
+          <SidebarIcon active={activeTab === 'kosoado'} onClick={() => setActiveTab('kosoado')} icon={<Map size={22}/>} />
+          <SidebarIcon active={activeTab === 'verbs'} onClick={() => setActiveTab('verbs')} icon={<Zap size={22}/>} />
+        </nav>
+      </aside>
 
-      <main className="max-w-6xl mx-auto p-4 md:p-10">
+      {/* MAIN VIEW */}
+      <main className="lg:pl-20">
         
-        {/* TAB NAVIGATION */}
-        <div className="flex justify-start md:justify-center gap-2 mb-10 overflow-x-auto no-scrollbar pb-2 px-2">
-            <TabBtn active={activeTab === 'particles'} onClick={() => setActiveTab('particles')} icon={<Layers size={14}/>} label="Particles" />
-            <TabBtn active={activeTab === 'numbers'} onClick={() => setActiveTab('numbers')} icon={<Hash size={14}/>} label="Numbers" />
-            <TabBtn active={activeTab === 'kosoado'} onClick={() => setActiveTab('kosoado')} icon={<Map size={14}/>} label="Do-Ko-A-So" />
-            <TabBtn active={activeTab === 'verbs'} onClick={() => setActiveTab('verbs')} icon={<Zap size={14}/>} label="Verbs" />
-        </div>
+        {/* HEADER */}
+        <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 px-6 py-4 flex items-center justify-between">
+          <div className="flex flex-col">
+            <h1 className="text-xl font-black tracking-tight text-slate-900 uppercase italic">Nihongono <span className="text-rose-500">Sensei</span></h1>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1">Language Lab v2.0</p>
+          </div>
+          
+          <div className="flex items-center gap-3 bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <button onClick={() => setBridge('en')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'en' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200' : 'text-slate-400'}`}>ENGLISH</button>
+            <button onClick={() => setBridge('hi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'hi' ? 'bg-white text-rose-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400'}`}>HINDI</button>
+          </div>
+        </header>
 
-        {/* PARTICLES */}
-        {activeTab === 'particles' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
-            {Object.entries(particleGroups).map(([groupName, items], i) => (
-              <div key={i} className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
-                <div className="bg-slate-900 px-6 py-3"><h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-500">{groupName}</h3></div>
-                <div className="p-6 space-y-3">
+        <div className="max-w-6xl mx-auto p-6 md:p-12">
+          
+          {/* PARTICLES VIEW */}
+          {activeTab === 'particles' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-in fade-in duration-700">
+              {Object.entries(particleGroups).map(([group, items], i) => (
+                <div key={i} className="space-y-4">
+                  <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] pl-2">{group}</h3>
                   {items.map((item, j) => (
-                    <button key={j} onClick={() => { setSelectedParticle(item.p); setIsParticleModalOpen(true); }} className="w-full flex items-center text-left gap-4 p-4 rounded-2xl transition-all bg-slate-50 hover:bg-rose-50 active:scale-95 group">
-                      <div className="text-2xl font-black italic text-slate-900 group-hover:text-rose-500 shrink-0">{item.p}</div>
-                      <div><p className="text-[9px] font-bold text-slate-400 uppercase">{item.label}</p><p className="text-xs font-medium text-slate-600 truncate max-w-[120px]">{bridge === 'en' ? item.en : item.hi}</p></div>
-                      <ChevronRight size={14} className="ml-auto text-slate-300" />
+                    <button 
+                      key={j} 
+                      onClick={() => { setSelectedParticle(item.p); setIsParticleModalOpen(true); }}
+                      className="w-full group bg-white p-5 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:border-rose-200 transition-all duration-300 text-left flex items-center gap-5"
+                    >
+                      <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl font-black italic text-slate-900 group-hover:bg-rose-50 group-hover:text-rose-600 transition-colors">
+                        {item.p}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[9px] font-black text-rose-400 uppercase mb-0.5">{item.label}</p>
+                        <p className="text-sm font-bold text-slate-600 leading-tight">
+                          {bridge === 'en' ? item.en : item.hi}
+                        </p>
+                      </div>
+                      <ChevronRight size={16} className="text-slate-300 group-hover:text-rose-400 group-hover:translate-x-1 transition-all" />
                     </button>
                   ))}
                 </div>
+              ))}
+            </div>
+          )}
+
+          {/* VERBS VIEW */}
+          {activeTab === 'verbs' && (
+            <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+              <div className="flex flex-wrap gap-3">
+                {Object.keys(verbGroups).map(key => (
+                  <button 
+                    key={key} 
+                    onClick={() => setSelectedVerbGroup(key)}
+                    className={`px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all ${selectedVerbGroup === key ? 'bg-slate-900 text-white shadow-2xl scale-105' : 'bg-white text-slate-400 border border-slate-200'}`}
+                  >
+                    {verbGroups[key].title} <span className="opacity-40 ml-2">/ {verbGroups[key].sub}</span>
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
 
-        {/* NUMBERS */}
-        {activeTab === 'numbers' && (
-          <div className="space-y-12 animate-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <CounterCard icon={<Box className="text-amber-500" size={20}/>} title="General (-tsu)" items={['hitotsu', 'futatsu', 'mittsu', 'yottsu', 'itsutsu', 'muttsu', 'nanatsu', 'yattsu', 'kokonotsu', 'tooo']} />
-              <CounterCard icon={<Users className="text-blue-500" size={20}/>} title="People (-nin)" items={['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★', 'go-nin', 'roku-nin', 'shichi-nin', 'hachi-nin', 'kyuu-nin', 'juu-nin']} />
-              <CounterCard icon={<Clock className="text-rose-500" size={20}/>} title="Time (-ji)" items={['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji', 'ku-ji ★', 'juu-ji']} />
-            </div>
-          </div>
-        )}
-
-        {/* DO-KO-A-SO */}
-        {activeTab === 'kosoado' && (
-          <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm animate-in fade-in duration-500">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm font-bold min-w-[700px]">
-                    <thead className="bg-slate-900 text-white text-[10px] uppercase tracking-widest">
-                        <tr><th className="p-6">Logic</th><th className="p-6 text-rose-400">KO</th><th className="p-6 text-blue-400">SO</th><th className="p-6 text-emerald-400">A</th><th className="p-6 text-amber-400">DO</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                        {Object.keys(kosoData).map(k => (
-                            <tr key={k} onClick={() => { setSelectedKoso(k); setIsKosoModalOpen(true); }} className="cursor-pointer hover:bg-rose-50 transition-colors group">
-                                <td className="p-6 text-[10px] text-slate-400 uppercase">{k}</td>
-                                {kosoData[k].row.map((cell, idx) => ( <td key={idx} className="p-6 text-slate-800 group-hover:text-rose-500">{cell}</td> ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-          </div>
-        )}
-
-        {/* VERBS */}
-        {activeTab === 'verbs' && (
-          <div className="space-y-10 animate-in fade-in duration-500">
-            <SectionHeader title="Interactive Verbs" sub="Click any verb to explore logic and conjugation." />
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-              {Object.keys(verbGroups).map(key => (
-                <button key={key} onClick={() => setSelectedVerbGroup(key)} className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase transition-all shrink-0 ${selectedVerbGroup === key ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100'}`}>{verbGroups[key].title}</button>
-              ))}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {verbGroups[selectedVerbGroup].verbs.map((v, idx) => (
-                <button 
-                  key={idx} 
-                  onClick={() => { setSelectedVerb(v); setIsVerbModalOpen(true); }}
-                  className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm text-left hover:shadow-xl hover:border-rose-200 transition-all group flex flex-col justify-between h-56"
-                >
-                  <div className="flex justify-between items-start w-full">
-                    <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Dictionary</p>
-                      <h4 className="text-2xl font-black text-slate-900 italic group-hover:text-rose-500 transition-colors">{v.dict}</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {verbGroups[selectedVerbGroup].verbs.map((v, idx) => (
+                  <button 
+                    key={idx} 
+                    onClick={() => { setSelectedVerb(v); setIsVerbModalOpen(true); }}
+                    className="group relative bg-white p-8 rounded-[2.5rem] border border-slate-200/60 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 text-left overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-bl-[5rem] -mr-10 -mt-10 group-hover:bg-rose-50 transition-colors z-0" />
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-start mb-10">
+                        <div className="p-3 bg-slate-900 text-white rounded-2xl shadow-lg"><PlayCircle size={20}/></div>
+                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{v.rel}</span>
+                      </div>
+                      <h4 className="text-4xl font-black text-slate-900 italic group-hover:text-rose-600 transition-colors">{v.dict}</h4>
+                      <p className="text-slate-400 font-bold mt-2 uppercase text-[10px] tracking-widest">
+                        {bridge === 'en' ? v.en : v.hi}
+                      </p>
                     </div>
-                    <div className="bg-slate-900 text-white p-2 rounded-xl"><PlayCircle size={18} /></div>
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-[10px] font-black text-rose-500 uppercase">Meaning</p>
-                    <p className="text-lg font-black text-slate-700">{bridge === 'en' ? v.en : v.hi}</p>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2 text-slate-300 font-bold text-[10px] uppercase tracking-widest">
-                    Breakdown <ChevronRight size={12} />
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* NUMBERS VIEW */}
+          {activeTab === 'numbers' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in zoom-in-95">
+              <CounterCard icon={<Box className="text-amber-500" size={24}/>} title="Objects" sub="(-tsu)" items={['hitotsu', 'futatsu', 'mittsu', 'yottsu', 'itsutsu', 'muttsu', 'nanatsu', 'yattsu', 'kokonotsu', 'tooo']} />
+              <CounterCard icon={<Users className="text-blue-500" size={24}/>} title="People" sub="(-nin)" items={['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★', 'go-nin', 'roku-nin', 'shichi-nin']} />
+              <CounterCard icon={<Clock className="text-rose-500" size={24}/>} title="Time" sub="(-ji)" items={['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji']} />
+            </div>
+          )}
+
+          {/* KOSOADO VIEW */}
+          {activeTab === 'kosoado' && (
+            <div className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden shadow-xl animate-in fade-in">
+              <table className="w-full text-left">
+                <thead className="bg-slate-900 text-white text-[10px] uppercase tracking-[0.3em]">
+                  <tr>
+                    <th className="p-8">Category</th>
+                    <th className="p-8 text-rose-400">KO (Near)</th>
+                    <th className="p-8 text-blue-400">SO (Mid)</th>
+                    <th className="p-8 text-emerald-400">A (Far)</th>
+                    <th className="p-8 text-amber-400">DO (?)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-bold">
+                  {Object.keys(kosoData).map(k => (
+                    <tr key={k} onClick={() => { setSelectedKoso(k); setIsKosoModalOpen(true); }} className="hover:bg-rose-50/30 transition-colors cursor-pointer group">
+                      <td className="p-8 text-slate-400 text-xs uppercase">{kosoData[k].title}</td>
+                      {kosoData[k].row.map((cell, idx) => (
+                        <td key={idx} className="p-8 text-slate-800 group-hover:text-rose-600 transition-colors">{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+        </div>
       </main>
 
-      {/* MODALS */}
+      {/* MODAL SYSTEM */}
       {(isParticleModalOpen || isKosoModalOpen || isVerbModalOpen) && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setIsParticleModalOpen(false); setIsKosoModalOpen(false); setIsVerbModalOpen(false); }}></div>
-          <div className="relative bg-slate-900 text-white w-full sm:max-w-lg rounded-t-[3rem] sm:rounded-[3rem] p-10 shadow-2xl animate-in slide-in-from-bottom-10 duration-300 overflow-y-auto max-h-[90vh] no-scrollbar">
-            <button onClick={() => { setIsParticleModalOpen(false); setIsKosoModalOpen(false); setIsVerbModalOpen(false); }} className="absolute top-8 right-8 text-slate-400"><X size={24} /></button>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => { setIsParticleModalOpen(false); setIsKosoModalOpen(false); setIsVerbModalOpen(false); }}></div>
+          <div className="relative bg-white w-full max-w-xl rounded-[3.5rem] p-10 shadow-2xl animate-in slide-in-from-bottom-10">
+            <button onClick={() => { setIsParticleModalOpen(false); setIsKosoModalOpen(false); setIsVerbModalOpen(false); }} className="absolute top-10 right-10 text-slate-300 hover:text-slate-900 transition-colors"><X size={32}/></button>
             
             {isParticleModalOpen && (
               <div className="space-y-8">
-                <div><h3 className="text-5xl font-black text-rose-500 mb-2 italic">{selectedParticle}</h3><p className="text-sm font-black text-slate-400 uppercase">{particleDetails[selectedParticle]?.title}</p></div>
+                <div className="flex items-center gap-6">
+                  <div className="text-7xl font-black italic text-rose-500">{selectedParticle}</div>
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900">{particleDetails[selectedParticle]?.title}</h3>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Grammar Particle</p>
+                  </div>
+                </div>
                 <div className="space-y-6">
-                  <div><span className="text-[10px] font-black uppercase text-rose-400 mb-2 block">Logic Bridge</span><p className="text-sm text-white font-medium leading-relaxed">{bridge === 'en' ? particleDetails[selectedParticle]?.en_logic : particleDetails[selectedParticle]?.hi_logic}</p></div>
-                  <div className="p-6 bg-white/5 rounded-3xl border border-white/10 flex flex-col gap-2"><div className="flex items-center gap-2"><Zap size={14} className="text-rose-400" /><span className="text-[10px] font-black uppercase text-rose-400">Mastery Tip</span></div><p className="text-xs text-slate-300 leading-relaxed font-medium italic">{particleDetails[selectedParticle]?.multitask}</p></div>
+                  <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100">
+                    <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest block mb-3">Logic Bridge</span>
+                    <p className="text-lg font-bold text-slate-700 leading-relaxed">{bridge === 'en' ? particleDetails[selectedParticle]?.en_logic : particleDetails[selectedParticle]?.hi_logic}</p>
+                  </div>
+                  <div className="flex items-start gap-4 p-6">
+                    <div className="bg-amber-100 text-amber-600 p-3 rounded-2xl"><Sparkles size={20}/></div>
+                    <div><p className="text-[10px] font-black uppercase text-slate-400 mb-1">Sensei's Tip</p><p className="text-sm font-bold text-slate-600 italic">{particleDetails[selectedParticle]?.multitask}</p></div>
+                  </div>
                 </div>
               </div>
             )}
 
             {isVerbModalOpen && selectedVerb && (
-              <div className="space-y-8">
-                <div className="flex justify-between items-start">
-                   <div><h3 className="text-4xl font-black text-rose-500 italic mb-1">{selectedVerb.dict}</h3><p className="text-sm font-black text-slate-400 uppercase tracking-widest">{bridge === 'en' ? selectedVerb.en : selectedVerb.hi}</p></div>
-                   <div className="bg-rose-500 text-white px-3 py-1 rounded-lg text-xs font-black uppercase">Polite: {selectedVerb.polite}</div>
+              <div className="space-y-8 text-center md:text-left">
+                <div>
+                  <h3 className="text-6xl font-black text-rose-500 italic">{selectedVerb.dict}</h3>
+                  <div className="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
+                    <span className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase">POLITE: {selectedVerb.polite}</span>
+                    <span className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest">{bridge === 'en' ? selectedVerb.en : selectedVerb.hi}</span>
+                  </div>
                 </div>
-                <div className="space-y-6">
-                  <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
-                    <span className="text-[10px] font-black uppercase text-rose-400 mb-2 block tracking-[0.2em]">Grammar Relation</span>
-                    <p className="text-sm text-white font-medium leading-relaxed">{bridge === 'en' ? selectedVerb.rel_en : selectedVerb.rel_hi}</p>
-                  </div>
-                  <div className="p-6 bg-slate-50/5 rounded-3xl border border-white/5">
-                    <span className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-[0.2em]">Example</span>
-                    <p className="text-xl font-black text-white italic">"{selectedVerb.ex}"</p>
-                  </div>
+                <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Example Sentence</p>
+                  <p className="text-3xl font-black text-slate-900 italic">"{selectedVerb.ex}"</p>
                 </div>
               </div>
             )}
-
+            
             {isKosoModalOpen && selectedKoso && (
               <div className="space-y-8">
-                <div><h3 className="text-4xl font-black text-rose-500 mb-2 italic">{kosoData[selectedKoso]?.title}</h3><p className="text-sm font-black text-slate-400 uppercase">Spatial Logic</p></div>
-                <div className="space-y-6">
-                  <div><span className="text-[10px] font-black uppercase text-rose-400 mb-2 block">Logic Bridge</span><p className="text-xl font-black text-white leading-tight">{bridge === 'en' ? kosoData[selectedKoso].bridgeEn : kosoData[selectedKoso].bridgeHi}</p></div>
-                  <div className="p-6 bg-white/5 rounded-3xl border border-white/10 flex flex-col gap-2"><div className="flex items-center gap-2"><Info size={14} className="text-rose-400" /><span className="text-[10px] font-black uppercase text-rose-400 tracking-widest">Sensei Tip</span></div><p className="text-xs text-slate-300 leading-relaxed font-medium italic">{kosoData[selectedKoso].tip}</p></div>
+                <h3 className="text-4xl font-black text-slate-900 tracking-tighter">{kosoData[selectedKoso].title}</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                    <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Meaning</p>
+                    <p className="text-lg font-black text-slate-800">{bridge === 'en' ? kosoData[selectedKoso].en : kosoData[selectedKoso].hi}</p>
+                  </div>
+                  <div className="p-6 bg-rose-50 rounded-3xl border border-rose-100">
+                    <p className="text-[10px] font-black text-rose-400 uppercase mb-2">Rule</p>
+                    <p className="text-sm font-bold text-rose-900">{kosoData[selectedKoso].tip}</p>
+                  </div>
                 </div>
               </div>
             )}
@@ -241,33 +271,34 @@ const App = () => {
         </div>
       )}
 
-      {/* MOBILE BOTTOM NAV */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md border border-slate-200 px-6 py-4 rounded-full shadow-2xl flex gap-8 z-30 md:hidden">
-          <NavIcon active={activeTab === 'particles'} onClick={() => setActiveTab('particles')} icon={<Layers size={20}/>} />
-          <NavIcon active={activeTab === 'numbers'} onClick={() => setActiveTab('numbers')} icon={<Hash size={20}/>} />
-          <NavIcon active={activeTab === 'kosoado'} onClick={() => setActiveTab('kosoado')} icon={<Map size={20}/>} />
-          <NavIcon active={activeTab === 'verbs'} onClick={() => setActiveTab('verbs')} icon={<Zap size={20}/>} />
+      {/* MOBILE NAV */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-xl px-8 py-5 rounded-full shadow-2xl flex gap-10 lg:hidden z-[60] border border-white/10">
+        <SidebarIcon active={activeTab === 'particles'} onClick={() => setActiveTab('particles')} icon={<Layers size={20}/>} />
+        <SidebarIcon active={activeTab === 'numbers'} onClick={() => setActiveTab('numbers')} icon={<Hash size={20}/>} />
+        <SidebarIcon active={activeTab === 'kosoado'} onClick={() => setActiveTab('kosoado')} icon={<Map size={20}/>} />
+        <SidebarIcon active={activeTab === 'verbs'} onClick={() => setActiveTab('verbs')} icon={<Zap size={20}/>} />
       </div>
+
     </div>
   );
 };
 
-const TabBtn = ({ active, onClick, icon, label, color = "text-slate-600" }) => (
-  <button onClick={onClick} className={`hidden md:flex items-center gap-3 px-8 py-4 rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest transition-all shrink-0 ${active ? 'bg-slate-900 text-white shadow-xl scale-105' : `${color} hover:bg-slate-50`}`}>{icon} {label}</button>
+// --- SUB-COMPONENTS ---
+const SidebarIcon = ({ active, onClick, icon }) => (
+  <button onClick={onClick} className={`transition-all duration-300 p-2 rounded-xl ${active ? 'text-rose-500 scale-125' : 'text-slate-500 hover:text-white'}`}>{icon}</button>
 );
 
-const NavIcon = ({ active, onClick, icon }) => (
-  <button onClick={onClick} className={`transition-all shrink-0 ${active ? 'text-rose-500 scale-125' : 'text-slate-400'}`}>{icon}</button>
-);
-
-const SectionHeader = ({ title, sub }) => (
-  <div className="text-center md:text-left mb-10 px-2"><h2 className="text-4xl font-black text-slate-900 tracking-tighter italic">{title}</h2><p className="text-slate-400 font-bold text-xs uppercase tracking-[0.3em] mt-2">{sub}</p></div>
-);
-
-const CounterCard = ({ icon, title, items }) => (
-  <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm space-y-6 flex flex-col transition-all hover:shadow-md">
-    <div className="flex items-center gap-3">{icon}<h3 className="text-sm font-black uppercase tracking-tight text-slate-800">{title}</h3></div>
-    <div className="flex flex-wrap gap-2">{items.map((it, i) => ( <span key={i} className={`text-[10px] font-bold px-3 py-1.5 rounded-xl border ${it.includes('★') ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-slate-50 border-slate-100 text-slate-600'}`}>{it}</span> ))}</div>
+const CounterCard = ({ icon, title, sub, items }) => (
+  <div className="bg-white p-10 rounded-[3rem] border border-slate-200/60 shadow-sm flex flex-col gap-8 group hover:shadow-2xl transition-all">
+    <div className="flex items-center gap-4">
+      <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-rose-50 transition-colors">{icon}</div>
+      <div><h3 className="text-lg font-black text-slate-900 leading-none">{title}</h3><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{sub}</p></div>
+    </div>
+    <div className="flex flex-wrap gap-2">
+      {items.map((it, i) => (
+        <span key={i} className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border transition-colors ${it.includes('★') ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-slate-50 border-slate-100 text-slate-500'}`}>{it}</span>
+      ))}
+    </div>
   </div>
 );
 
