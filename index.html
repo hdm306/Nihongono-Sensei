@@ -9,11 +9,32 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'ja,hi,en',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; top: 0 !important; }
         .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(14px); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .goog-te-banner-frame.skiptranslate { display: none !important; } 
+        /* Hiding the Google Translate Top Bar for a cleaner UI */
+        .goog-te-gadget-simple {
+            background-color: #F1F5F9 !important;
+            border: 1px solid #E2E8F0 !important;
+            padding: 8px 12px !important;
+            border-radius: 12px !important;
+            font-size: 10px !important;
+            font-weight: bold !important;
+        }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-zoom { animation: zoomIn 0.3s ease-out; }
     </style>
@@ -29,48 +50,49 @@
             const [bridge, setBridge] = useState('en');
             const [selected, setSelected] = useState(null);
 
+            // DATA
             const particles = [
                 { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...', logic: 'Sets the main topic.' },
-                { p: 'ga', label: 'Subject', en: 'The actor.', hi: 'Karta (ne)', logic: 'Pinpoints the specific subject.' },
+                { p: 'ga', label: 'Subject', en: 'The actor.', hi: 'Karta (ne)', logic: 'Pinpoints specific subject.' },
                 { p: 'o', label: 'Object', en: 'The target.', hi: 'Karma (ko)', logic: 'The thing being acted upon.' },
-                { p: 'ni', label: 'Target/Time', en: 'At / To', hi: 'Sthan/Samay', logic: 'Destination or specific time.' },
-                { p: 'de', label: 'Location', en: 'Action place', hi: 'Kriya sthan', logic: 'Where the action happens.' },
+                { p: 'ni', label: 'Target/Time', en: 'At / To', hi: 'Sthan/Samay', logic: 'Destination or time.' },
+                { p: 'de', label: 'Location', en: 'Action place', hi: 'Kriya sthan', logic: 'Where action happens.' },
                 { p: 'no', label: 'Possession', en: "X's Y", hi: 'Ka/Ke/Ki', logic: 'Connects two nouns.' }
             ];
 
             const kosoado = [
-                { id: 'item', title: "Things (物)", row: ["kore", "sore", "are", "dore"], desc_en: "Pronouns for objects.", desc_hi: "Cheezon ke liye pronouns." },
-                { id: 'place', title: "Places (場所)", row: ["koko", "soko", "asoko", "doko"], desc_en: "Locations in space.", desc_hi: "Jagah ke liye use hota hai." },
-                { id: 'adj', title: "Adjectives (連体)", row: ["kono", "sono", "ano", "dono"], desc_en: "Must be followed by a noun.", desc_hi: "Iske baad Noun aana zaroori hai." },
-                { id: 'dir', title: "Direction (方向)", row: ["kochira", "sochira", "achira", "dochira"], desc_en: "Polite/Directional terms.", desc_hi: "Taraf ya disha batane ke liye." }
+                { id: 'item', title: "Things", row: ["kore", "sore", "are", "dore"] },
+                { id: 'place', title: "Places", row: ["koko", "soko", "asoko", "doko"] },
+                { id: 'adj', title: "Adjectives", row: ["kono", "sono", "ano", "dono"] },
+                { id: 'dir', title: "Direction", row: ["kochira", "sochira", "achira", "dochira"] }
             ];
 
             const spatialDetails = {
-                kore: { en: "This (near me)", hi: "Yeh (mere paas)", ex: "Kore wa hon desu.", logic_en: "Use for items you are holding or touching.", logic_hi: "Un cheezon ke liye jo aapke haath mein ya bilkul paas hain." },
-                sore: { en: "That (near you)", hi: "Woh (aapke paas)", ex: "Sore wa nan desu ka?", logic_en: "Use for items near the person you are talking to.", logic_hi: "Jo cheez sunne wale ke paas hai." },
-                are: { en: "That far away", hi: "Woh door wala", ex: "Are wa yama desu.", logic_en: "Use for items far from both people.", logic_hi: "Jo cheez dono se door hai." },
-                dore: { en: "Which one?", hi: "Kaunsa wala?", ex: "Dore ga anata no desu ka?", logic_en: "Used to ask a question between 3+ items.", logic_hi: "Sawaal puchne ke liye (kaunsa)." },
-                koko: { en: "Here", hi: "Yahan", ex: "Koko wa gakkou desu.", logic_en: "This spot right here.", logic_hi: "Bas yahi jagah." },
-                soko: { en: "There", hi: "Wahan", ex: "Soko ni suwatte kudasai.", logic_en: "The spot near the listener.", logic_hi: "Wahan, sunne wale ke paas wali jagah." },
-                asoko: { en: "Over there", hi: "Wahan door", ex: "Asoko ni toire ga arimasu.", logic_en: "A spot far from everyone.", logic_hi: "Door wali jagah." },
-                doko: { en: "Where?", hi: "Kahan?", ex: "Doko ni ikimasu ka?", logic_en: "Questioning a location.", logic_hi: "Jagah ka sawaal." },
-                kono: { en: "This [Noun]", hi: "Yeh [Noun]", ex: "Kono pen wa watashi no desu.", logic_en: "Modifies a specific noun near you.", logic_hi: "Iske baad cheez ka naam bolna padega." },
-                sono: { en: "That [Noun]", hi: "Woh [Noun]", ex: "Sono hon o yomimasu.", logic_en: "Modifies a noun near the listener.", logic_hi: "Sunne wale ke paas wali cheez." },
-                ano: { en: "That far [Noun]", hi: "Woh door wala [Noun]", ex: "Ano hito wa dare desu ka?", logic_en: "Modifies a distant noun.", logic_hi: "Door wala koi person ya cheez." },
-                dono: { en: "Which [Noun]?", hi: "Kaunsa [Noun]?", ex: "Dono kutsu desu ka?", logic_en: "Asking 'Which [X]?'", logic_hi: "Kaunsi cheez?" },
-                kochira: { en: "This way", hi: "Is taraf", ex: "Kochira e douzo.", logic_en: "Polite direction or person near me.", logic_hi: "Izzat ke saath disha batana." },
-                sochira: { en: "That way", hi: "Us taraf", ex: "Sochira wa deguchi desu.", logic_en: "Direction near the listener.", logic_hi: "Aapki taraf wali disha." },
-                achira: { en: "That way (far)", hi: "Us door taraf", ex: "Achira ni resutoran ga arimasu.", logic_en: "Distant direction.", logic_hi: "Door wali disha." },
-                dochira: { en: "Which way?", hi: "Kis taraf?", ex: "Dochira ga suki desu ka?", logic_en: "Polite 'Where' or 'Which'.", logic_hi: "Kis taraf ya kaunsa (polite)." }
+                kore: { en: "This (near me)", hi: "Yeh (paas)", ex: "Kore wa hon desu.", logic: "For items you touch." },
+                sore: { en: "That (near you)", hi: "Woh (aapke paas)", ex: "Sore wa nan desu ka?", logic: "For items near listener." },
+                are: { en: "That far away", hi: "Woh door wala", ex: "Are wa yama desu.", logic: "Far from both." },
+                dore: { en: "Which one?", hi: "Kaunsa?", ex: "Dore desu ka?", logic: "Questioning objects." },
+                koko: { en: "Here", hi: "Yahan", ex: "Koko desu.", logic: "Current spot." },
+                soko: { en: "There", hi: "Wahan", ex: "Soko ni.", logic: "Listener's spot." },
+                asoko: { en: "Over there", hi: "Door wahan", ex: "Asoko desu.", logic: "Distant spot." },
+                doko: { en: "Where?", hi: "Kahan?", ex: "Doko desu ka?", logic: "Asking location." },
+                kono: { en: "This [X]", hi: "Yeh [X]", ex: "Kono hon.", logic: "Must follow with noun." },
+                sono: { en: "That [X]", hi: "Woh [X]", ex: "Sono pen.", logic: "Noun near listener." },
+                ano: { en: "That far [X]", hi: "Woh door [X]", ex: "Ano hito.", logic: "Noun far away." },
+                dono: { en: "Which [X]?", hi: "Kaunsa [X]?", ex: "Dono kutsu?", logic: "Asking 'Which [X]?'" },
+                kochira: { en: "This way", hi: "Is taraf", ex: "Kochira e.", logic: "Polite direction." },
+                sochira: { en: "That way", hi: "Us taraf", ex: "Sochira e.", logic: "Listener's direction." },
+                achira: { en: "Far way", hi: "Door taraf", ex: "Achira e.", logic: "Distant direction." },
+                dochira: { en: "Which way?", hi: "Kis taraf?", ex: "Dochira?", logic: "Asking direction." }
             };
 
             const counters = [
                 { title: 'General (-tsu)', items: ['hitotsu', 'futatsu', 'mittsu', 'yottsu', 'itsutsu', 'muttsu', 'nanatsu', 'yattsu', 'kokonotsu', 'tooo'] },
                 { title: 'People (-nin)', items: ['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★', 'go-nin', 'roku-nin', 'shichi-nin'] },
                 { title: 'Time (-ji)', items: ['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji'] },
-                { title: 'Small Items (-ko)', items: ['ikko', 'niko', 'sanko', 'yonko', 'goko', 'rokko', 'nanako', 'hakko'] },
-                { title: 'Flat Objects (-mai)', items: ['ichimai', 'nimai', 'sanmai', 'yonmai', 'gomai', 'rokumai', 'nanamai'] },
-                { title: 'Animals (-piki)', items: ['ippiki ★', 'nihiki', 'sanbiki ★', 'yonhiki', 'gohiki', 'roppiki ★'] }
+                { title: 'Small (-ko)', items: ['ikko', 'niko', 'sanko', 'yonko', 'goko', 'rokko'] },
+                { title: 'Flat (-mai)', items: ['ichimai', 'nimai', 'sanmai', 'yonmai', 'gomai'] },
+                { title: 'Animals (-piki)', items: ['ippiki ★', 'nihiki', 'sanbiki ★', 'yonhiki', 'gohiki'] }
             ];
 
             const verbs = [
@@ -96,19 +118,18 @@
                         </nav>
                     </aside>
 
-                    {/* MAIN AREA */}
+                    {/* MAIN */}
                     <main className="flex-1 lg:ml-24 pb-24 lg:pb-10">
                         <header className="sticky top-0 z-40 glass border-b border-slate-100 px-6 lg:px-12 py-6 flex flex-wrap justify-between items-center gap-4">
-                            <div className="flex-shrink-0">
+                            <div>
                                 <h1 className="text-xl lg:text-2xl font-extrabold tracking-tighter text-slate-900 italic uppercase leading-none">Nihongono <span className="text-rose-500 font-black">Sensei</span></h1>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2">By Japa & Himanshu</p>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">By Japa & Himanshu</p>
                             </div>
 
-                            {/* ZERO API GOOGLE SEARCH */}
-                            <form action="https://www.google.com/search" method="get" target="_blank" className="flex-1 max-w-md relative group">
-                                <input type="text" name="q" placeholder="Search Google..." className="w-full bg-slate-100 border border-slate-200 py-3 pl-12 pr-4 rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-rose-500/20 focus:bg-white transition-all" />
-                                <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-rose-500 text-lg transition-colors">search</span>
-                            </form>
+                            {/* GOOGLE TRANSLATE BOX */}
+                            <div className="flex-1 max-w-sm flex items-center justify-center">
+                                <div id="google_translate_element"></div>
+                            </div>
                             
                             <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
                                 <button onClick={() => setBridge('en')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'en' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}>EN</button>
@@ -119,7 +140,7 @@
                         <div className="max-w-7xl mx-auto p-6 lg:p-12">
                             {activeTab === 'particles' && (
                                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <SectionHeader title="Essential Particles" sub="The Logic of Japanese Sentences" />
+                                    <SectionHeader title="Essential Particles" sub="The Logic of Sentences" />
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {particles.map((item, i) => (
                                             <Card key={i} item={item} bridge={bridge} onClick={() => setSelected({type: 'particle', data: item})} />
@@ -130,7 +151,7 @@
 
                             {activeTab === 'kosoado' && (
                                 <div className="animate-in fade-in duration-500">
-                                    <SectionHeader title="Spatial Logic" sub="Click any word for Logic Card" />
+                                    <SectionHeader title="Spatial Logic" sub="Do-Ko-A-So Pronouns" />
                                     <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden">
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left border-collapse min-w-[800px]">
@@ -143,21 +164,13 @@
                                                         <th className="p-8 text-amber-400">DO (?)</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-y divide-slate-100">
+                                                <tbody className="divide-y divide-slate-100 font-bold">
                                                     {kosoado.map((obj, i) => (
-                                                        <tr key={i} className="hover:bg-slate-50/50">
-                                                            <td className="p-8 border-r border-slate-50 bg-slate-50/30">
-                                                                <p className="text-xs font-black uppercase text-slate-500">{obj.title}</p>
-                                                                <p className="text-[9px] mt-1 text-slate-300 font-bold tracking-wider">{bridge === 'en' ? obj.desc_en : obj.desc_hi}</p>
-                                                            </td>
+                                                        <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                                            <td className="p-8 bg-slate-50/30 text-xs uppercase text-slate-400 tracking-widest">{obj.title}</td>
                                                             {obj.row.map((word, j) => (
-                                                                <td key={j} className="p-4">
-                                                                    <button 
-                                                                        onClick={() => setSelected({type: 'spatial', id: word})}
-                                                                        className="w-full py-8 rounded-2xl hover:bg-rose-50 hover:text-rose-500 transition-all text-xl italic font-black uppercase tracking-tighter"
-                                                                    >
-                                                                        {word}
-                                                                    </button>
+                                                                <td key={j} className="p-4 text-center">
+                                                                    <button onClick={() => setSelected({type: 'spatial', id: word})} className="w-full py-8 rounded-2xl hover:bg-rose-50 hover:text-rose-500 transition-all text-xl italic font-black uppercase tracking-tighter">{word}</button>
                                                                 </td>
                                                             ))}
                                                         </tr>
@@ -189,7 +202,7 @@
 
                             {activeTab === 'verbs' && (
                                 <div className="animate-in fade-in duration-500">
-                                    <SectionHeader title="Mastering Verbs" sub="Action Words & Conjugation" />
+                                    <SectionHeader title="Mastering Verbs" sub="Action Words" />
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {verbs.map((v, i) => (
                                             <button key={i} onClick={() => setSelected({type: 'verb', data: v})} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left flex flex-col justify-between h-56 overflow-hidden relative">
@@ -218,23 +231,14 @@
                                 
                                 {selected.type === 'spatial' && (
                                     <div className="space-y-8">
-                                        <div>
-                                            <h4 className="text-7xl font-black text-rose-500 italic uppercase tracking-tighter leading-none">{selected.id}</h4>
-                                            <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.3em] mt-6">Logic breakdown</p>
+                                        <h4 className="text-7xl font-black text-rose-500 italic uppercase tracking-tighter leading-none">{selected.id}</h4>
+                                        <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                                            <p className="text-xs font-black text-rose-500 mb-1 uppercase">Meaning</p>
+                                            <p className="text-xl font-bold italic text-slate-700">"{bridge === 'en' ? spatialDetails[selected.id].en : spatialDetails[selected.id].hi}"</p>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100 shadow-inner">
-                                                <p className="text-[9px] font-black text-rose-500 uppercase mb-2">Sensei Logic</p>
-                                                <p className="text-lg font-bold text-slate-700 italic leading-snug">"{bridge === 'en' ? spatialDetails[selected.id].logic_en : spatialDetails[selected.id].logic_hi}"</p>
-                                            </div>
-                                            <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100 flex flex-col justify-center">
-                                                <p className="text-[9px] font-black text-rose-500 uppercase mb-2">Translation</p>
-                                                <p className="text-2xl font-black text-rose-900 italic tracking-tight">{bridge === 'en' ? spatialDetails[selected.id].en : spatialDetails[selected.id].hi}</p>
-                                            </div>
-                                        </div>
-                                        <div className="p-8 bg-slate-950 text-white rounded-[2.5rem] border border-white/10">
-                                            <p className="text-[9px] font-black text-rose-400 uppercase mb-3">Sentence Practice</p>
-                                            <p className="text-2xl font-black italic tracking-wide">"{spatialDetails[selected.id].ex}"</p>
+                                        <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100">
+                                            <p className="text-xs font-black text-rose-500 mb-1 uppercase">Example</p>
+                                            <p className="text-xl font-black italic text-rose-900 leading-snug">"{spatialDetails[selected.id].ex}"</p>
                                         </div>
                                     </div>
                                 )}
@@ -242,20 +246,20 @@
                                 {selected.type === 'particle' && (
                                     <div className="space-y-8">
                                         <div className="text-8xl font-black italic text-rose-500 tracking-tighter">{selected.data.p}</div>
-                                        <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 shadow-inner">
-                                            <p className="text-xl font-bold text-slate-700 leading-relaxed italic">"{bridge === 'en' ? selected.data.en : selected.data.hi} — {selected.data.logic}"</p>
+                                        <div className="p-8 bg-slate-50 rounded-2xl border border-slate-100 italic font-bold text-lg text-slate-600">
+                                            {bridge === 'en' ? selected.data.en : selected.data.hi} — {selected.data.logic}
                                         </div>
                                     </div>
                                 )}
 
                                 {selected.type === 'verb' && (
                                     <div className="space-y-8">
-                                        <h4 className="text-7xl font-black text-rose-500 italic tracking-tighter leading-none">{selected.data.dict}</h4>
-                                        <div className="grid grid-cols-2 gap-4 text-center lg:text-left">
-                                            <div className="p-8 bg-slate-950 text-white rounded-3xl shadow-xl"><p className="text-[9px] font-black text-rose-400 mb-1 tracking-widest">Polite Form</p><p className="text-2xl font-black italic tracking-tight">{selected.data.polite}</p></div>
-                                            <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100"><p className="text-[9px] font-black text-rose-500 mb-1 tracking-widest">Meaning</p><p className="text-2xl font-black italic text-rose-900">{bridge === 'en' ? selected.data.en : selected.data.hi}</p></div>
+                                        <h4 className="text-7xl font-black text-rose-500 italic leading-none">{selected.data.dict}</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="p-8 bg-slate-950 text-white rounded-3xl shadow-xl"><p className="text-[9px] font-black text-rose-400 mb-1 uppercase">Polite</p><p className="text-2xl font-black italic">{selected.data.polite}</p></div>
+                                            <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100"><p className="text-[9px] font-black text-rose-500 mb-1 uppercase">Meaning</p><p className="text-2xl font-black italic text-rose-900">{bridge === 'en' ? selected.data.en : selected.data.hi}</p></div>
                                         </div>
-                                        <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 shadow-inner"><p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Context Example</p><p className="text-3xl font-black text-slate-800 italic leading-snug">"{selected.data.ex}"</p></div>
+                                        <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic font-black text-2xl text-slate-800">"{selected.data.ex}"</div>
                                     </div>
                                 )}
                             </div>
