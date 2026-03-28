@@ -1,12 +1,3 @@
-I have updated the **Particles** and **Face-Off** sections as requested. 
-
-1.  **Face-Off Cards Styling**: The text now renders as **"NI vs DE"** instead of all uppercase, making the distinction between the particles and the "vs" clearer on the main dashboard.
-2.  **Detailed Pop-ups**: I have expanded the explanation for all particles. Every pop-up now includes a descriptive breakdown of the rule and **Japanese Roomaji** examples paired with **English/Hinglish** translations.
-3.  **Personalization**: The examples still dynamically use your name.
-
-### Nihongono Sensei | Complete Master Lab
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +8,7 @@ I have updated the **Particles** and **Face-Off** sections as requested.
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; margin: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; margin: 0; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(14px); }
         .animate-zoom { animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         @keyframes zoom { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
@@ -46,9 +37,9 @@ I have updated the **Particles** and **Face-Off** sections as requested.
             const handleNameSubmit = (e) => {
                 e.preventDefault();
                 if (tempName.trim()) {
-                    const formattedName = tempName.trim();
-                    localStorage.setItem('nihongo_user', formattedName);
-                    setUserName(formattedName);
+                    const name = tempName.trim();
+                    localStorage.setItem('nihongo_user', name);
+                    setUserName(name);
                 }
             };
 
@@ -57,51 +48,81 @@ I have updated the **Particles** and **Face-Off** sections as requested.
                 return text.replace(/Himanshu|Tanaka-san|User|Student|Japa/g, `${userName}-san`);
             };
 
-            // --- DATA ENGINE: PARTICLES (EXPANDED LOGIC) ---
+            // --- DATA ENGINE: PARTICLES WITH DUAL USE CASES ---
             const particleGroups = [
                 { title: "Essential Basics", items: [
-                    {p:'wa', label:'Topic', en:'As for X...', hi:'X ke baare mein...', logic:'Marks the Topic of the sentence. Think of it as setting the stage. Everything after "wa" describes the topic.', ex:'Watashi wa Himanshu desu. (I am Himanshu / Main Himanshu hoon.)'},
-                    {p:'ga', label:'Subject', en:'The Actor', hi:'Karta (ne)', logic:'Identifies the specific Subject. While "wa" is general, "ga" is like pointing a finger at who/what is doing the action.', ex:'Himanshu ga ikimasu. (It is Himanshu who is going / Himanshu hi jaa raha hai.)'},
-                    {p:'o', label:'Object', en:'Target', hi:'Karma', logic:'Used to mark the Direct Object. It connects the action (verb) to the thing being acted upon.', ex:'Kohii o nomimasu. (I drink coffee / Main coffee peeta hoon.)'}
+                    {
+                        p:'WA', label:'Topic', 
+                        logic_en:'Marks the main topic. Sets the stage.', 
+                        logic_hi:'Vishay ko mark karta hai. Sentence isi ke baare mein hai.', 
+                        cases: [
+                            { label: 'Name/ID', ex_en: 'Watashi WA Himanshu desu. (I am Himanshu)', ex_hi: 'Watashi WA Himanshu desu. (Main Himanshu hoon)' },
+                            { label: 'General Fact', ex_en: 'Nihon WA kirei desu. (Japan is beautiful)', ex_hi: 'Nihon WA kirei desu. (Japan sundar hai)' }
+                        ]
+                    },
+                    {
+                        p:'GA', label:'Subject', 
+                        logic_en:'Identifies the specific actor. Focuses on WHO.', 
+                        logic_hi:'Karta ko identify karta hai. "Kaun" par zor deta hai.', 
+                        cases: [
+                            { label: 'Identifying', ex_en: 'Himanshu GA ikimasu. (Himanshu is the one going)', ex_hi: 'Himanshu GA ikimasu. (Himanshu hi jaa raha hai)' },
+                            { label: 'Existence', ex_en: 'Terebi GA arimasu. (There is a TV)', ex_hi: 'Terebi GA arimasu. (TV wahan hai)' }
+                        ]
+                    },
+                    {
+                        p:'O', label:'Object', 
+                        logic_en:'Connects action to the object being used/eaten.', 
+                        logic_hi:'Kriya aur karma ko jodta hai.', 
+                        cases: [
+                            { label: 'Consumption', ex_en: 'Kohii O nomimasu. (Drink coffee)', ex_hi: 'Kohii O nomimasu. (Coffee peena)' },
+                            { label: 'General Action', ex_en: 'Hon O yomimasu. (Read a book)', ex_hi: 'Hon O yomimasu. (Kitaab padhna)' }
+                        ]
+                    }
                 ]},
                 { title: "Movement & Direction", items: [
-                    {p:'ni', label:'Target', en:'To/At', hi:'Sthan', logic:'Marks a specific point in time or a final destination. Use this when the goal of the movement is the most important.', ex:'Nihon ni ikimasu. (I am going to Japan / Main Japan jaa raha hoon.)'},
-                    {p:'e', label:'Heading', en:'Towards', hi:'Taraf', logic:'Focuses on the Direction of travel rather than just the arrival point. It sounds more poetic or focus-on-the-journey.', ex:'Gakkou e ikimasu. (Going towards school / School ki taraf jaana.)'},
-                    {p:'kara', label:'Start', en:'From', hi:'Se (Shuru)', logic:'Indicates the starting point in time or space. "From X".', ex:'Indo kara kimashita. (I came from India / Main India se aaya hoon.)'},
-                    {p:'made', label:'End', en:'Until', hi:'Tak', logic:'Indicates the ending point in time or space. "Until Y".', ex:'Go-ji made hatarakimasu. (I work until 5:00 / Main 5 baje tak kaam karta hoon.)'}
-                ]},
-                { title: "Connectors", items: [
-                    {p:'no', label:'Linker', en:'Possession', hi:'Ka/Ke/Ki', logic:'Shows ownership or relation. It connects Noun A to Noun B.', ex:'Watashi no tomodachi. (My friend / Mera dost.)'},
-                    {p:'mo', label:'Also', en:'Too/Also', hi:'Bhi', logic:'Replaces "wa" or "ga" to include something similar to what was previously mentioned.', ex:'Watashi mo ikimasu. (I am also going / Main bhi jaa raha hoon.)'},
-                    {p:'to', label:'With/And', en:'Together', hi:'Saath', logic:'Lists multiple items (A and B) or indicates doing something with someone.', ex:'Tanaka-san to hanashimasu. (Talking with Tanaka / Tanaka ke saath baat karna.)'},
-                    {p:'soshite', label:'And then', en:'Next', hi:'Aur phir', logic:'Used at the start of a sentence to link it to the previous one sequentially.', ex:'Tabemasu. Soshite nemasu. (I eat. And then I sleep. / Khana khata hoon. Aur phir sota hoon.)'}
+                    {
+                        p:'NI', label:'Target', 
+                        logic_en:'Marks destination or a specific time.', 
+                        logic_hi:'Manzil ya samay ko mark karta hai.', 
+                        cases: [
+                            { label: 'Destination', ex_en: 'Nihon NI ikimasu. (Going to Japan)', ex_hi: 'Nihon NI ikimasu. (Japan jaa raha hoon)' },
+                            { label: 'Time Point', ex_en: 'Go-ji NI nemasu. (Sleep at 5:00)', ex_hi: 'Go-ji NI nemasu. (5 baje sona)' }
+                        ]
+                    },
+                    {
+                        p:'E', label:'Heading', 
+                        logic_en:'Focuses on the direction/journey.', 
+                        logic_hi:'Yatra ki disha (direction) par zor.', 
+                        cases: [
+                            { label: 'Direction', ex_en: 'Uchi E kaerimasu. (Heading home)', ex_hi: 'Uchi E kaerimasu. (Ghar ki taraf jaana)' },
+                            { label: 'Poetic Path', ex_en: 'Kita E iku. (Going North)', ex_hi: 'Kita E iku. (Uttar ki taraf jaana)' }
+                        ]
+                    }
                 ]}
             ];
 
             const multitaskers = [
-                { p: 'ni vs de', title: 'The Existence Battle', logic: 'Use "ni" for static existence (staying/sitting). Use "de" for active events (working/eating).', compare: [{side:'NI (Static)', desc:'Staying/Sitting/Existing', ex:'Isu ni suwaru. (Sitting on chair.)'}, {side:'DE (Active)', desc:'Action/Working/Task', ex:'Kafe de yomu. (Reading at a cafe.)'}] },
-                { p: 'ni vs e', title: 'Goal vs Journey', logic: '"ni" is the target point (Final Goal). "e" is the heading direction (The Journey).', compare: [{side:'NI (Goal)', desc:'Arrival point focus', ex:'Tokyo ni taita. (Arrived at Tokyo.)'}, {side:'E (Direction)', desc:'Heading toward focus', ex:'Tokyo e mukau. (Heading toward Tokyo.)'}] },
-                { p: 'wa vs ga', title: 'Information Duel', logic: '"wa" highlights what happens next (the info). "ga" highlights WHO is doing it (the subject).', compare: [{side:'WA (General)', desc:'Fact/Topic focus', ex:'Inu wa kawaii. (Dogs are cute.)'}, {side:'GA (Specific)', desc:'Identify "The One"', ex:'Inu ga kita! (THE dog came!)'}] },
-                { p: 'de', title: 'The Multi-Tool', logic: '"de" has 3 major roles: Place of action, Tool used, or the Total sum of items.', roles: [{name:'Location', desc:'Active spot', ex:'Uchi de taberu.'}, {name:'Tool', desc:'By means of', ex:'Basu de iku.'}, {name:'Total', desc:'Final sum', ex:'Zenbu de 500-en.'}] }
+                { 
+                    p: 'NI vs DE', title: 'Static vs Active', 
+                    logic_en: 'NI for existence/staying. DE for active events/tasks.', 
+                    logic_hi: 'NI rehne/hone ke liye. DE kaam karne ke liye.', 
+                    compare: [
+                        { side:'NI', desc_en:'Existing/Staying', desc_hi:'Hona/Baithna', cases: [{label:'Location', ex_en:'Uchi NI imasu. (At home)', ex_hi:'Ghar NI hona'}] },
+                        { side:'DE', desc_en:'Activity/Action', desc_hi:'Kaam/Activity', cases: [{label:'Action', ex_en:'Uchi DE taberu. (Eat at home)', ex_hi:'Ghar DE khana'}] }
+                    ] 
+                },
+                { 
+                    p: 'WA vs GA', title: 'Info vs Actor', 
+                    logic_en: 'WA for general facts. GA to identify the specific one.', 
+                    logic_hi: 'WA jaankari ke liye. GA pehchaan (Kaun?) ke liye.', 
+                    compare: [
+                        { side:'WA', desc_en:'General Topic', desc_hi:'Sadharan Vishay', cases: [{label:'Fact', ex_en:'Inu WA kawaii. (Dogs are cute)', ex_hi:'Kutta WA pyaara hai'}] },
+                        { side:'GA', desc_en:'Subject Focus', desc_hi:'Karta focus', cases: [{label:'Identification', ex_en:'Inu GA kita! (THE dog came)', ex_hi:'Kutta GA aaya'}] }
+                    ] 
+                }
             ];
 
-            // --- DATA ENGINE: SPATIAL ---
-            const kosoadoTable = [
-                { title: "Things", row: ["kore", "sore", "are", "dore"], en: "Objects", hi: "Cheezein" },
-                { title: "Places", row: ["koko", "soko", "asoko", "doko"], en: "Locations", hi: "Jagah" },
-                { title: "Adjectives", row: ["kono", "sono", "ano", "dono"], en: "Need Noun", hi: "Saath Noun" },
-                { title: "Direction", row: ["kochira", "sochira", "achira", "dochira"], en: "Polite", hi: "Izzat" }
-            ];
-
-            const spatialDetails = {
-                kore: { logic: "Item near the speaker.", ex: "Kore wa Himanshu no pen desu." },
-                sore: { logic: "Item near the listener.", ex: "Sore wa nan desu ka?" },
-                are: { logic: "Item far from both people.", ex: "Are wa yama desu." },
-                koko: { logic: "The location where I am.", ex: "Koko wa Anand desu." },
-                kochira: { logic: "Polite way to say 'Here' or 'Me'.", ex: "Kochira e douzo." }
-            };
-
-            // --- DATA ENGINE: CALENDAR ---
+            // --- REMAINING DATA ENGINE: CALENDAR & NUMBERS ---
             const calendarData = {
                 months: [
                     { m: 'Jan', r: 'Ichi-gatsu' }, { m: 'Feb', r: 'Ni-gatsu' }, { m: 'Mar', r: 'San-gatsu' }, { m: 'Apr', r: 'Shi-gatsu ★' },
@@ -116,41 +137,10 @@ I have updated the **Particles** and **Face-Off** sections as requested.
                 ]
             };
 
-            // --- DATA ENGINE: NUMBERS ---
-            const basicNumbers = [
-                { n: '1', r: 'ichi' }, { n: '2', r: 'ni' }, { n: '3', r: 'san' }, { n: '4', r: 'yon' }, { n: '5', r: 'go' },
-                { n: '6', r: 'roku' }, { n: '7', r: 'nana' }, { n: '8', r: 'hachi' }, { n: '9', r: 'kyuu' }, { n: '10', r: 'juu' },
-                { n: '100', r: 'hyaku' }, { n: '1,000', r: 'sen' }, { n: '10,000', r: 'man' }
-            ];
-
             const clockData = {
                 hours: ['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji', 'ku-ji ★', 'juu-ji'],
                 minutes: ['ippun ★', 'nifun', 'sanpun ★', 'yonpun ★', 'gofun', 'roppun ★', 'nanafun', 'happun ★', 'kyuufun', 'juppun ★']
             };
-
-            const counterCards = [
-                { title: 'General (-tsu)', logic: 'Universal objects.', items: ['hitotsu', 'futatsu', 'mittsu', 'yottsu'], ex: 'Mittsu no ringo.' },
-                { title: 'People (-nin)', logic: 'Counting humans.', items: ['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★'], ex: 'Sannin no tomodachi.' }
-            ];
-
-            const puns = [{ n: '39', r: 'San-Kyuu', m: 'Thank You' }, { n: '4649', r: 'Yoroshiku', m: 'Nice to meet you' }, { n: '2525', r: 'Niko-Niko', m: 'Smiling' }];
-
-            // --- DATA ENGINE: VERBS ---
-            const verbGroups = [
-                { title: 'Group 1', rule: 'u → i + masu', verbs: [
-                    { dict: 'Iku', polite: 'Ikimasu', en: 'Go', hi: 'Jaana', ex: 'Kaisha ni ikimasu.' },
-                    { dict: 'Nomu', polite: 'Nomimasu', en: 'Drink', hi: 'Peena', ex: 'Mizu o nomimasu.' },
-                    { dict: 'Kau', polite: 'Kaimasu', en: 'Buy', hi: 'Khareedna', ex: 'Hon o kaimasu.' }
-                ]},
-                { title: 'Group 2', rule: 'drop ru + masu', verbs: [
-                    { dict: 'Taberu', polite: 'Tabemasu', en: 'Eat', hi: 'Khana', ex: 'Gohan o tabemasu.' },
-                    { dict: 'Miru', polite: 'Mimasu', en: 'Watch', hi: 'Dekhna', ex: 'Eiga o mimasu.' }
-                ]},
-                { title: 'Group 3', rule: 'Irregular', verbs: [
-                    { dict: 'Suru', polite: 'Shimasu', en: 'Do', hi: 'Karna', ex: 'Benkyou o shimasu.' },
-                    { dict: 'Kuru', polite: 'Kimasu', en: 'Come', hi: 'Aana', ex: 'Himanshu ga kimasu.' }
-                ]}
-            ];
 
             if (!userName) {
                 return (
@@ -161,7 +151,7 @@ I have updated the **Particles** and **Face-Off** sections as requested.
                             <p className="text-slate-400 font-bold text-[11px] uppercase tracking-widest mt-4 mb-10">Personalize your learning lab</p>
                             <form onSubmit={handleNameSubmit} className="space-y-4">
                                 <input type="text" placeholder="Enter Name..." className="w-full bg-slate-100 py-5 px-8 rounded-2xl text-lg font-bold outline-none text-center focus:ring-4 focus:ring-teal-500/10" value={tempName} onChange={(e) => setTempName(e.target.value)} autoFocus />
-                                <button className="w-full bg-teal-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-rose-600 transition-all">Start Experience</button>
+                                <button className="w-full bg-teal-600 text-white py-5 rounded-2xl font-black uppercase shadow-xl hover:bg-rose-600 transition-all">Start Experience</button>
                             </form>
                         </div>
                     </div>
@@ -170,19 +160,17 @@ I have updated the **Particles** and **Face-Off** sections as requested.
 
             return (
                 <div className="min-h-screen flex flex-col lg:flex-row">
-                    <aside className="hidden lg:flex w-32 bg-slate-950 flex-col items-center py-10 fixed h-full z-50">
+                    <aside className="hidden lg:flex w-32 bg-slate-950 flex-col items-center py-10 fixed h-full z-50 shadow-2xl">
                         <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg text-xl mb-12">N</div>
                         <nav className="flex flex-col gap-6 w-full px-2 text-center">
                             <SidebarBtn active={activeTab === 'particles'} icon="layers" label="Particles" onClick={() => setActiveTab('particles')} />
-                            <SidebarBtn active={activeTab === 'kosoado'} icon="map" label="Spatial" onClick={() => setActiveTab('kosoado')} />
                             <SidebarBtn active={activeTab === 'calendar'} icon="calendar_today" label="Calendar" onClick={() => setActiveTab('calendar')} />
                             <SidebarBtn active={activeTab === 'numbers'} icon="tag" label="Numbers" onClick={() => setActiveTab('numbers')} />
-                            <SidebarBtn active={activeTab === 'verbs'} icon="bolt" label="Verbs" onClick={() => setActiveTab('verbs')} />
                         </nav>
                         <button onClick={() => {localStorage.removeItem('nihongo_user'); window.location.reload();}} className="mt-auto text-slate-600 hover:text-teal-400 mb-6 transition-colors"><span className="material-icons">logout</span></button>
                     </aside>
 
-                    <main className="flex-1 lg:ml-32 pb-24 lg:pb-10">
+                    <main className="flex-1 lg:ml-32 pb-24">
                         <header className="sticky top-0 z-40 glass border-b border-slate-100 px-8 py-6 flex justify-between items-center">
                             <div><h1 className="text-xl lg:text-2xl font-black tracking-tighter text-slate-900 italic uppercase leading-none">Nihongono <span className="text-teal-600 font-black">Sensei</span></h1><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">Welcome, {userName}-san</p></div>
                             <div className="flex bg-slate-100 p-1 rounded-xl">
@@ -192,18 +180,17 @@ I have updated the **Particles** and **Face-Off** sections as requested.
                         </header>
 
                         <div className="max-w-7xl mx-auto p-6 lg:p-12 space-y-20">
-                            {/* TAB: PARTICLES */}
                             {activeTab === 'particles' && (
                                 <div className="space-y-20 animate-zoom">
                                     {particleGroups.map((group, idx) => (
                                         <div key={idx} className="space-y-6">
                                             <h2 className="text-2xl font-black text-slate-900 italic uppercase border-l-4 border-teal-500 pl-4">{group.title}</h2>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {group.items.map((item, i) => (
                                                     <button key={i} onClick={() => setSelected({type: 'particle', data: item})} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left h-56 relative overflow-hidden flex flex-col justify-between">
                                                         <div className="absolute top-0 right-0 p-10 text-slate-50 font-black text-8xl italic uppercase leading-none">{item.p}</div>
-                                                        <div className="relative z-10"><p className="text-[10px] font-black text-teal-600 uppercase mb-1">{item.label}</p><h3 className="text-4xl font-black text-slate-900 italic uppercase tracking-tighter leading-none">{item.p}</h3></div>
-                                                        <p className="text-slate-500 font-extrabold text-xs relative z-10">{bridge === 'en' ? item.en : item.hi}</p>
+                                                        <div className="relative z-10"><p className="text-[10px] font-black text-teal-600 uppercase mb-1">{item.label}</p><h3 className="text-4xl font-black text-slate-900 italic uppercase tracking-tighter">{item.p}</h3></div>
+                                                        <p className="text-slate-500 font-extrabold text-xs relative z-10">{bridge === 'en' ? 'Deep Logic' : 'Puri Baat'}</p>
                                                     </button>
                                                 ))}
                                             </div>
@@ -217,7 +204,7 @@ I have updated the **Particles** and **Face-Off** sections as requested.
                                                     <div className="absolute -right-6 -top-6 text-white/5 text-[150px] font-black italic leading-none">{mt.p.split(' ')[0]}</div>
                                                     <div className="relative z-10 space-y-4">
                                                         <p className="text-amber-400 font-black text-[10px] uppercase tracking-[0.2em]">{mt.title}</p>
-                                                        <h3 className="text-4xl font-black text-white italic tracking-tighter leading-none">{mt.p}</h3>
+                                                        <h3 className="text-4xl font-black text-white italic tracking-tighter uppercase">{mt.p}</h3>
                                                     </div>
                                                 </button>
                                             ))}
@@ -226,94 +213,38 @@ I have updated the **Particles** and **Face-Off** sections as requested.
                                 </div>
                             )}
 
-                            {/* TAB: SPATIAL */}
-                            {activeTab === 'kosoado' && (
-                                <div className="animate-zoom bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden">
-                                    <div className="overflow-x-auto no-scrollbar">
-                                        <table className="w-full text-left min-w-[800px]">
-                                            <thead className="bg-slate-950 text-white text-[10px] uppercase font-black tracking-widest">
-                                                <tr><th className="p-10">Type</th><th className="p-10 text-teal-400 italic">KO</th><th className="p-10 text-blue-400 italic">SO</th><th className="p-10 text-emerald-400 italic">A</th><th className="p-10 text-amber-400 italic">DO</th></tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-100 font-bold">
-                                                {kosoadoTable.map((obj, i) => (
-                                                    <tr key={i} className="hover:bg-teal-50/50 transition-colors">
-                                                        <td className="p-10 bg-slate-50 border-r border-slate-100"><p className="text-xs font-black text-slate-900 uppercase leading-none">{obj.title}</p><p className="text-[9px] mt-2 text-slate-300 uppercase tracking-widest">{bridge === 'en' ? obj.en : obj.hi}</p></td>
-                                                        {obj.row.map((word, j) => (<td key={j} className="p-4"><button onClick={() => setSelected({type: 'spatial', id: word})} className="w-full py-8 rounded-2xl hover:bg-white hover:shadow-xl hover:text-teal-600 font-black text-2xl italic uppercase tracking-tighter transition-all">{word}</button></td>))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* TAB: CALENDAR */}
-                            {activeTab === 'calendar' && (
-                                <div className="space-y-12 animate-zoom">
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                        <div className="bg-slate-900 p-10 rounded-[3rem] shadow-2xl text-white">
-                                            <h2 className="text-amber-400 font-black text-2xl uppercase italic mb-8 border-l-4 border-amber-400 pl-4">Months</h2>
-                                            <div className="grid grid-cols-3 gap-3">
-                                                {calendarData.months.map((m, i) => (<div key={i} className="bg-white/5 border border-white/10 p-4 rounded-xl text-center"><p className="text-white/30 text-[9px] font-black uppercase">{m.m}</p><p className={`text-xs font-bold ${m.r.includes('★') ? 'text-teal-400' : 'text-white'}`}>{m.r}</p></div>))}
-                                            </div>
-                                        </div>
-                                        <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl">
-                                            <h2 className="text-teal-600 font-black text-2xl uppercase italic mb-8 border-l-4 border-teal-600 pl-4">Weekdays</h2>
-                                            <div className="space-y-3">
-                                                {calendarData.weekdays.map((w, i) => (<div key={i} className="flex justify-between p-4 bg-slate-50 rounded-xl font-black italic uppercase"><span>{w.r}</span><span className="text-slate-300 tracking-widest text-[10px]">{bridge === 'en' ? w.en : w.hi}</span></div>))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* TAB: NUMBERS */}
                             {activeTab === 'numbers' && (
                                 <div className="space-y-12 animate-zoom">
-                                    <div className="bg-white rounded-[3rem] p-10 shadow-xl border border-slate-100">
-                                        <h2 className="text-teal-600 font-black text-2xl uppercase italic mb-8 border-l-4 border-teal-600 pl-4">Basic Numbers</h2>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
-                                            {basicNumbers.map((num, i) => (
-                                                <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-slate-100"><p className="text-2xl font-black text-slate-900">{num.n}</p><p className="text-[10px] font-bold text-slate-400 uppercase">{num.r}</p></div>
-                                            ))}
-                                        </div>
-                                    </div>
                                     <div className="clock-gradient rounded-[3rem] p-10 shadow-2xl text-white relative overflow-hidden">
                                         <h2 className="text-amber-400 font-black text-2xl italic uppercase mb-10 tracking-tighter">Clock Mastery</h2>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                            <div><p className="text-white/40 font-black text-[10px] uppercase tracking-widest mb-4">Hours (Ji)</p><div className="grid grid-cols-5 gap-2">{clockData.hours.map((h, i) => (<div key={i} className="bg-white/5 border border-white/10 p-3 rounded-xl text-center"><p className={`text-[10px] font-bold ${h.includes('★') ? 'text-rose-400' : 'text-white'}`}>{h}</p></div>))}</div></div>
-                                            <div><p className="text-white/40 font-black text-[10px] uppercase tracking-widest mb-4">Minutes (Pun)</p><div className="grid grid-cols-2 gap-3">{clockData.minutes.map((m, i) => (<div key={i} className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex justify-between"><span className="text-white/20 text-xs">{i+1}m</span><span className={`text-xs font-black ${m.includes('★') ? 'text-rose-400' : 'text-white'}`}>{m}</span></div>))}</div></div>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                                        {counterCards.map((group, i) => (
-                                            <div key={i} className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col justify-between">
-                                                <div><h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">{group.title}</h3><div className="flex flex-wrap gap-2.5">{group.items.map((it, j) => (<span key={j} className="px-4 py-2 rounded-xl text-xs font-bold border italic bg-slate-50 text-slate-600">{it}</span>))}</div></div>
-                                                <p className="text-teal-600 font-black text-[9px] uppercase tracking-widest mt-6 italic">Ex: {pEx(group.ex)}</p>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
+                                            <div>
+                                                <p className="text-white/40 font-black text-[10px] uppercase tracking-widest border-b border-white/10 pb-2 mb-6 tracking-tighter">Hours (Ji)</p>
+                                                <div className="grid grid-cols-5 gap-2">{clockData.hours.map((h, i) => (<div key={i} className="bg-white/5 border border-white/10 p-3 rounded-xl text-center"><p className="text-white/20 text-[8px] font-black">{i+1}</p><p className={`text-[10px] font-bold ${h.includes('★') ? 'text-rose-400' : 'text-white'}`}>{h.split(' ')[0]}</p></div>))}</div>
                                             </div>
-                                        ))}
-                                        <div className="bg-teal-600 p-10 rounded-[3rem] shadow-xl text-white col-span-1 lg:col-span-2 text-center flex flex-col justify-center items-center h-full"><h3 className="text-xl font-black uppercase mb-6 italic tracking-widest">Digital Puns</h3><div className="flex flex-wrap justify-center gap-10">{puns.map((p, i) => (<div key={i}><p className="text-3xl font-black">{p.n}</p><p className="text-[9px] uppercase font-black opacity-60 tracking-widest">{p.r}</p><p className="font-bold text-xs mt-1 uppercase">{p.m}</p></div>))}</div></div>
+                                            <div>
+                                                <p className="text-white/40 font-black text-[10px] uppercase tracking-widest border-b border-white/10 pb-2 mb-6 tracking-tighter">Minutes (Pun/Fun)</p>
+                                                <div className="grid grid-cols-2 gap-3">{clockData.minutes.map((m, i) => (<div key={i} className="bg-white/5 border border-white/10 px-4 py-2 rounded-2xl flex justify-between items-center"><span className="text-white/20 text-xs font-black">{i+1}m</span><span className={`text-xs font-black ${m.includes('★') ? 'text-teal-400 italic' : 'text-white'}`}>{m.replace(' ★', '')}</span></div>))}</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* TAB: VERBS */}
-                            {activeTab === 'verbs' && (
-                                <div className="space-y-16 animate-zoom">
-                                    {verbGroups.map((group, idx) => (
-                                        <div key={idx} className="space-y-6">
-                                            <h2 className="text-2xl font-black text-slate-900 italic uppercase border-l-4 border-rose-500 pl-4">{group.title} <span className="text-slate-300 ml-2 font-normal italic">/ {group.rule}</span></h2>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                                {group.verbs.map((v, i) => (
-                                                    <button key={i} onClick={() => setSelected({type: 'verb', data: v})} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left flex flex-col justify-between h-56 relative overflow-hidden group">
-                                                        <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-bl-full group-hover:bg-rose-50 transition-colors"></div>
-                                                        <div className="relative z-10"><span className="text-[9px] font-black text-rose-500 uppercase">POLITE: {v.polite}</span><h3 className="text-3xl font-black text-slate-900 italic mt-1 group-hover:text-rose-600 transition-colors leading-none tracking-tighter uppercase">{v.dict}</h3></div>
-                                                        <p className="text-slate-400 font-extrabold text-sm uppercase relative z-10">{bridge === 'en' ? v.en : v.hi}</p>
-                                                    </button>
-                                                ))}
-                                            </div>
+                            {activeTab === 'calendar' && (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-zoom">
+                                    <div className="bg-slate-900 p-10 rounded-[3rem] shadow-2xl text-white">
+                                        <h2 className="text-amber-400 font-black text-2xl uppercase italic mb-8 border-l-4 border-amber-400 pl-4">Months</h2>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {calendarData.months.map((m, i) => (<div key={i} className="bg-white/5 border border-white/10 p-4 rounded-xl font-bold flex justify-between"><span>{m.m}</span><span>{m.r}</span></div>))}
                                         </div>
-                                    ))}
+                                    </div>
+                                    <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl">
+                                        <h2 className="text-teal-600 font-black text-2xl uppercase italic mb-8 border-l-4 border-teal-600 pl-4">Weekdays</h2>
+                                        <div className="space-y-3">
+                                            {calendarData.weekdays.map((w, i) => (<div key={i} className="flex justify-between p-4 bg-slate-50 rounded-xl font-black italic uppercase"><span>{w.r}</span><span className="text-slate-300 tracking-widest text-[10px]">{bridge === 'en' ? w.en : w.hi}</span></div>))}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -322,38 +253,51 @@ I have updated the **Particles** and **Face-Off** sections as requested.
                     {/* MODAL SYSTEM */}
                     {selected && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md" onClick={() => setSelected(null)}>
-                            <div className="relative bg-white w-full max-w-xl rounded-[4rem] p-10 lg:p-14 shadow-2xl animate-zoom overflow-y-auto max-h-[90vh] no-scrollbar" onClick={e => e.stopPropagation()}>
+                            <div className="relative bg-white w-full max-w-xl rounded-[4rem] p-12 lg:p-16 shadow-2xl animate-zoom overflow-y-auto max-h-[90vh] no-scrollbar" onClick={e => e.stopPropagation()}>
                                 <button onClick={() => setSelected(null)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-900 transition-colors"><span className="material-icons text-3xl">close</span></button>
+                                
                                 {selected.type === 'multitask' && (
                                     <div className="space-y-10">
-                                        <div className="bg-slate-900 p-8 rounded-[2rem] text-center italic"><h4 className="text-6xl font-black text-amber-400 tracking-tighter uppercase">{selected.data.p}</h4></div>
-                                        <div className="p-8 bg-slate-50 rounded-3xl font-bold text-xl text-slate-700 italic border border-slate-100 leading-relaxed text-center">"{selected.data.logic}"</div>
-                                        <div className="grid grid-cols-1 gap-3">
-                                            {(selected.data.roles || selected.data.compare).map((item, j) => (
-                                                <div key={j} className="p-6 bg-rose-50 border border-rose-100 rounded-[1.5rem]"><p className="text-rose-500 font-black text-[10px] uppercase mb-1 tracking-widest">{item.name || item.side}</p><p className="text-slate-800 font-bold text-sm leading-snug">{item.desc}</p><p className="text-rose-900/40 font-black italic text-xs mt-2 italic">"{pEx(item.ex)}"</p></div>
+                                        <div className="bg-slate-900 p-8 rounded-[2.5rem] text-center italic">
+                                            <h4 className="text-6xl font-black text-amber-400 tracking-tighter uppercase">{selected.data.p}</h4>
+                                        </div>
+                                        <div className="p-8 bg-slate-50 rounded-3xl font-bold text-xl text-slate-700 italic border border-slate-100 leading-relaxed text-center">
+                                            "{bridge === 'en' ? selected.data.logic_en : selected.data.logic_hi}"
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-6">
+                                            {selected.data.compare.map((item, j) => (
+                                                <div key={j} className="p-6 bg-rose-50 border border-rose-100 rounded-[2rem] text-left">
+                                                    <p className="text-rose-600 font-black text-[11px] uppercase mb-1 tracking-widest">{item.side}</p>
+                                                    <p className="text-slate-800 font-bold text-base mb-4">{bridge === 'en' ? item.desc_en : item.desc_hi}</p>
+                                                    <div className="space-y-3">
+                                                        {item.cases.map((c, k) => (
+                                                            <div key={k} className="bg-white/50 p-4 rounded-xl border border-rose-100">
+                                                                <p className="text-[9px] font-black text-rose-400 uppercase mb-1 tracking-tighter italic">Case: {c.label}</p>
+                                                                <p className="text-slate-900 font-black italic text-lg leading-tight">"{pEx(bridge === 'en' ? c.ex_en : c.ex_hi)}"</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
                                 )}
+
                                 {selected.type === 'particle' && (
                                     <div className="space-y-8 text-center uppercase italic">
-                                        <h4 className="text-9xl font-black text-teal-600 leading-none tracking-tighter">{selected.data.p}</h4>
-                                        <div className="p-8 bg-slate-50 rounded-3xl font-bold text-xl text-slate-700 leading-relaxed italic border border-slate-100">"{selected.data.logic}"</div>
-                                        <div className="p-10 bg-slate-950 text-white rounded-[2.5rem] font-black italic text-2xl leading-tight shadow-xl shadow-teal-500/10 tracking-wide">"{pEx(selected.data.ex)}"</div>
-                                    </div>
-                                )}
-                                {selected.type === 'verb' && (
-                                    <div className="space-y-8 text-center uppercase italic">
-                                        <h4 className="text-8xl font-black text-teal-600 leading-none tracking-tighter">{selected.data.dict}</h4>
-                                        <p className="text-teal-600 font-black text-xs uppercase tracking-widest">Polite: {selected.data.polite}</p>
-                                        <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic font-black text-3xl text-slate-800 leading-tight">"{pEx(selected.data.ex)}"</div>
-                                    </div>
-                                )}
-                                {selected.type === 'spatial' && (
-                                    <div className="space-y-8 text-center">
-                                        <h4 className="text-7xl font-black italic text-rose-500 leading-none tracking-tighter uppercase">{selected.id}</h4>
-                                        <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic font-black text-3xl text-slate-800 leading-tight italic">"{pEx(spatialDetails[selected.id]?.ex || '...')}"</div>
-                                        <p className="text-slate-400 font-black text-xs uppercase tracking-[0.3em]">{spatialDetails[selected.id]?.logic}</p>
+                                        <h4 className="text-8xl font-black text-teal-600 leading-none tracking-tighter">{selected.data.p}</h4>
+                                        <div className="p-8 bg-slate-50 rounded-3xl font-bold text-xl text-slate-700 leading-relaxed italic border border-slate-100">
+                                            "{bridge === 'en' ? selected.data.logic_en : selected.data.logic_hi}"
+                                        </div>
+                                        <div className="space-y-4">
+                                            {selected.data.cases.map((c, i) => (
+                                                <div key={i} className="p-10 bg-slate-950 text-white rounded-[3rem] shadow-xl shadow-teal-500/10 tracking-wide text-left relative overflow-hidden">
+                                                    <div className="absolute right-0 top-0 p-6 opacity-10 text-[60px] font-black">{i+1}</div>
+                                                    <p className="text-[10px] font-black text-teal-400 uppercase mb-3 tracking-widest">Case: {c.label}</p>
+                                                    <p className="text-3xl font-black italic leading-tight">"{pEx(bridge === 'en' ? c.ex_en : c.ex_hi)}"</p>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -375,4 +319,3 @@ I have updated the **Particles** and **Face-Off** sections as requested.
     </script>
 </body>
 </html>
-```
