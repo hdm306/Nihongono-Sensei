@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongono Sensei | Final Master Dashboard</title>
+    <title>Nihongono Sensei | Final Master Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -47,7 +47,7 @@
                 return text.replace(/Himanshu|Tanaka-san|User|Student/g, `${userName}-san`);
             };
 
-            // --- DATA ENGINE: CALENDAR (COMPLETE 12 MONTHS) ---
+            // --- DATA: CALENDAR (12 MONTHS & 7 DAYS) ---
             const calendarData = {
                 months: [
                     { m: 'Jan', r: 'Ichi-gatsu' }, { m: 'Feb', r: 'Ni-gatsu' }, { m: 'Mar', r: 'San-gatsu' },
@@ -63,58 +63,68 @@
                 ]
             };
 
-            // --- DATA ENGINE: PARTICLES & MULTITASKERS ---
-            const particleGroups = [
-                { title: "Essential Basics", items: [
-                    {p:'wa', label:'Topic', en:'As for X...', hi:'X ke baare mein...', logic:'Sets the main topic.', ex:'Watashi wa Himanshu desu.'},
-                    {p:'ga', label:'Subject', en:'The Actor', hi:'Karta (ne)', logic:'Emphasis on WHO.', ex:'Himanshu ga ikimasu.'},
-                    {p:'o', label:'Object', en:'Target', hi:'Karma', logic:'Receives action.', ex:'Kohii o nomimasu.'}
-                ]},
-                { title: "Connectors", items: [
-                    {p:'no', label:'Linker', en:'Possession', hi:'Ka/Ke/Ki', logic:'Noun A describes B.', ex:'Watashi no tomodachi.'},
-                    {p:'mo', label:'Also', en:'Too/Also', hi:'Bhi', logic:'Including similar items.', ex:'Watashi mo ikimasu.'},
-                    {p:'to', label:'With/And', en:'Together', hi:'Saath', logic:'Companion or list.', ex:'Tanaka-san to hanasu.'},
-                    {p:'soshite', label:'Connector', en:'And then', hi:'Aur phir', logic:'Links sentences.', ex:'Tabemasu. Soshite nemasu.'}
-                ]}
-            ];
-
-            const multitaskers = [
-                { p: 'NI vs DE', title: 'Location Duel', logic: 'NI = Existence (Being). DE = Action (Doing).', compare: [{side:'NI', desc:'Being there', ex:'Isu ni suwaru.'}, {side:'DE', desc:'Doing there', ex:'Kafe de yomu.'}] },
-                { p: 'NI vs E', title: 'Goal vs Direction', logic: 'NI is the destination goal. E is the act of heading there.', compare: [{side:'NI', desc:'Final point', ex:'Tokyo ni iku.'}, {side:'E', desc:'Heading toward', ex:'Tokyo e mukau.'}] },
-                { p: 'WA vs GA', title: 'Emphasis Duel', logic: 'WA focuses on Info. GA focuses on Actor.', compare: [{side:'WA', desc:'Fact/Topic', ex:'Inu wa kawaii.'}, {side:'GA', desc:'Which one?', ex:'Inu ga kita!'}] }
-            ];
-
-            // --- DATA ENGINE: NUMBERS ---
+            // --- DATA: NUMBERS & PUNS ---
             const clockData = {
                 hours: ['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji', 'ku-ji ★', 'juu-ji'],
                 minutes: ['ippun ★', 'nifun', 'sanpun ★', 'yonpun ★', 'gofun', 'roppun ★', 'nanafun', 'happun ★', 'kyuufun', 'juppun ★']
             };
 
             const bigCounters = [
-                { title: 'General Objects (-tsu)', logic: 'General count for items.', items: ['hitotsu', 'futatsu', 'mittsu', 'yottsu'], ex: 'Ringo o mittsu (3 apples).' },
-                { title: 'People (-nin)', logic: 'Counting humans.', items: ['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★'], ex: 'Sannin no tomodachi.' }
+                { title: 'General Objects (-tsu)', logic: 'Universal counter for items.', items: ['hitotsu', 'futatsu', 'mittsu', 'yottsu', 'itsutsu'], ex: 'Mittsu no ringo (3 apples).' },
+                { title: 'People (-nin)', logic: 'Counting humans.', items: ['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★', 'go-nin'], ex: 'Futari no gakusei (2 students).' }
             ];
 
-            // --- DATA ENGINE: SPATIAL ---
-            const kosoadoTable = [
-                { title: "Things", row: ["kore", "sore", "are", "dore"], tag: "Objects" },
-                { title: "Places", row: ["koko", "soko", "asoko", "doko"], tag: "Locations" },
-                { title: "Adjectives", row: ["kono", "sono", "ano", "dono"], tag: "Need Noun" },
-                { title: "Direction", row: ["kochira", "sochira", "achira", "dochira"], tag: "Polite" }
+            const numberPuns = [
+                { n: '39', r: 'San-Kyuu', m: 'Thank You', logic: 'Sounds like English "Thank You".' },
+                { n: '4649', r: 'Yo-ro-shi-ku', m: 'Nice to meet you', logic: 'Standard greeting pun.' },
+                { n: '2525', r: 'Ni-ko-ni-ko', m: 'Smiling', logic: 'Onomatopoeia for a grin.' },
+                { n: '888', r: 'Pa-chi-pa-chi', m: 'Clapping', logic: 'Sound of applause.' },
+                { n: '084', r: 'O-ha-yo', m: 'Good Morning', logic: 'Early morning numeric greeting.' }
             ];
 
-            const spatialDetails = {
-                kore: { logic: "Near speaker.", ex: "Kore wa pen desu." },
-                sore: { logic: "Near listener.", ex: "Sore wa nan desu ka?" },
-                koko: { logic: "My spot.", ex: "Koko wa Anand desu." },
-                kochira: { logic: "Polite direction.", ex: "Kochira e douzo." }
-            };
-
-            // --- DATA ENGINE: VERBS ---
+            // --- DATA: VERBS (EXPANDED) ---
             const verbGroups = [
-                { title: 'Group 1', rule: 'u → i + masu', verbs: [{dict:'Iku', polite:'Ikimasu', en:'Go', hi:'Jaana', ex:'Kaisha ni iku.'}, {dict:'Nomu', polite:'Nomimasu', en:'Drink', hi:'Peena', ex:'Mizu o nomu.'}]},
-                { title: 'Group 2', rule: 'drop ru', verbs: [{dict:'Taberu', polite:'Tabemasu', en:'Eat', hi:'Khana', ex:'Ranchi o taberu.'}]},
-                { title: 'Group 3', rule: 'Fixed', verbs: [{dict:'Suru', polite:'Shimasu', en:'Do', hi:'Karna', ex:'Benkyou o suru.'}]}
+                { title: 'Group 1 (Godan)', rule: 'u → i + masu', verbs: [
+                    { dict: 'Iku', polite: 'Ikimasu', en: 'Go', hi: 'Jaana', ex: 'Kaisha ni ikimasu.' },
+                    { dict: 'Nomu', polite: 'Nomimasu', en: 'Drink', hi: 'Peena', ex: 'Mizu o nomimasu.' },
+                    { dict: 'Hanasu', polite: 'Hanashimasu', en: 'Speak', hi: 'Bolna', ex: 'Nihongo o hanashimasu.' },
+                    { dict: 'Kau', polite: 'Kaimasu', en: 'Buy', hi: 'Khareedna', ex: 'Hon o kaimasu.' },
+                    { dict: 'Matsu', polite: 'Machimasu', en: 'Wait', hi: 'Intezaar', ex: 'Chotto machimasu.' },
+                    { dict: 'Aruku', polite: 'Arukimasu', en: 'Walk', hi: 'Chalna', ex: 'Kouen o arukimasu.' }
+                ]},
+                { title: 'Group 2 (Ichidan)', rule: 'drop ru + masu', verbs: [
+                    { dict: 'Taberu', polite: 'Tabemasu', en: 'Eat', hi: 'Khana', ex: 'Gohan o tabemasu.' },
+                    { dict: 'Miru', polite: 'Mimasu', en: 'Watch', hi: 'Dekhna', ex: 'Eiga o mimasu.' },
+                    { dict: 'Neru', polite: 'Nemasu', en: 'Sleep', hi: 'Sona', ex: 'Juuji ni nemasu.' },
+                    { dict: 'Okiru', polite: 'Okimasu', en: 'Wake up', hi: 'Uthna', ex: 'Rokuji ni okimasu.' },
+                    { dict: 'Oshieru', polite: 'Oshiemasu', en: 'Teach', hi: 'Sikhana', ex: 'Nihongo o oshiemasu.' }
+                ]},
+                { title: 'Group 3 (Irregular)', rule: 'Fixed patterns', verbs: [
+                    { dict: 'Suru', polite: 'Shimasu', en: 'Do', hi: 'Karna', ex: 'Benkyou o shimasu.' },
+                    { dict: 'Kuru', polite: 'Kimasu', en: 'Come', hi: 'Aana', ex: 'Himanshu ga kimasu.' },
+                    { dict: 'Benkyou-suru', polite: 'Benkyou-shimasu', en: 'Study', hi: 'Padhna', ex: 'Mainichi benkyou-shimasu.' }
+                ]}
+            ];
+
+            // --- DATA: SPATIAL & PARTICLES ---
+            const kosoadoTable = [
+                { title: "Things", row: ["kore", "sore", "are", "dore"] },
+                { title: "Places", row: ["koko", "soko", "asoko", "doko"] },
+                { title: "Adjectives", row: ["kono", "sono", "ano", "dono"] },
+                { title: "Direction", row: ["kochira", "sochira", "achira", "dochira"] }
+            ];
+
+            const particleGroups = [
+                { title: "Basics", items: [
+                    {p:'wa', label:'Topic', en:'Topic', hi:'Vishay', logic:'Sets the stage.', ex:'Watashi wa Himanshu desu.'},
+                    {p:'ga', label:'Subject', en:'Actor', hi:'Karta', logic:'Emphasis on WHO.', ex:'Himanshu ga kita.'},
+                    {p:'o', label:'Object', en:'Target', hi:'Karma', logic:'The thing acted upon.', ex:'Kohii o nomu.'}
+                ]}
+            ];
+
+            const multitaskers = [
+                { p: 'NI vs DE', title: 'Location Duel', logic: 'NI = Existence. DE = Action.', compare: [{side:'NI', desc:'Being there', ex:'Uchi ni imasu.'}, {side:'DE', desc:'Doing there', ex:'Uchi de yomu.'}] },
+                { p: 'WA vs GA', title: 'Emphasis Duel', logic: 'WA = General info. GA = Specific actor.', compare: [{side:'WA', desc:'Fact', ex:'Inu wa kawaii.'}, {side:'GA', desc:'Identifier', ex:'Inu ga kita!'}] }
             ];
 
             if (!userName) {
@@ -126,7 +136,7 @@
                             <p className="text-slate-400 font-bold text-[11px] uppercase tracking-widest mt-4 mb-10">Personalize your learning lab</p>
                             <form onSubmit={handleNameSubmit} className="space-y-4">
                                 <input type="text" placeholder="Enter Name..." className="w-full bg-slate-100 py-5 px-8 rounded-2xl text-lg font-bold outline-none text-center focus:ring-4 focus:ring-teal-500/10" value={tempName} onChange={(e) => setTempName(e.target.value)} autoFocus />
-                                <button className="w-full bg-teal-600 text-white py-5 rounded-2xl font-black uppercase hover:bg-teal-700 transition-all shadow-lg">Start Learning</button>
+                                <button className="w-full bg-teal-600 text-white py-5 rounded-2xl font-black uppercase hover:bg-teal-700 transition-all shadow-lg">Start Experience</button>
                             </form>
                         </div>
                     </div>
@@ -136,7 +146,7 @@
             return (
                 <div className="min-h-screen flex flex-col lg:flex-row">
                     <aside className="hidden lg:flex w-32 bg-slate-950 flex-col items-center py-10 fixed h-full z-50">
-                        <div className="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg text-xl mb-12">N</div>
+                        <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg text-xl mb-12">N</div>
                         <nav className="flex flex-col gap-6 w-full px-2">
                             <SidebarBtn active={activeTab === 'particles'} icon="layers" label="Particles" onClick={() => setActiveTab('particles')} />
                             <SidebarBtn active={activeTab === 'kosoado'} icon="map" label="Spatial" onClick={() => setActiveTab('kosoado')} />
@@ -144,12 +154,12 @@
                             <SidebarBtn active={activeTab === 'numbers'} icon="tag" label="Numbers" onClick={() => setActiveTab('numbers')} />
                             <SidebarBtn active={activeTab === 'verbs'} icon="bolt" label="Verbs" onClick={() => setActiveTab('verbs')} />
                         </nav>
-                        <button onClick={() => {localStorage.removeItem('nihongo_user'); window.location.reload();}} className="mt-auto text-slate-600 hover:text-teal-400 mb-6 transition-colors"><span className="material-icons">logout</span></button>
+                        <button onClick={() => {localStorage.clear(); window.location.reload();}} className="mt-auto text-slate-600 hover:text-teal-400 mb-6 transition-colors"><span className="material-icons">logout</span></button>
                     </aside>
 
-                    <main className="flex-1 lg:ml-32 pb-24 lg:pb-10">
+                    <main className="flex-1 lg:ml-32 pb-24">
                         <header className="sticky top-0 z-40 glass border-b border-slate-100 px-8 py-6 flex justify-between items-center">
-                            <div><h1 className="text-xl lg:text-2xl font-black tracking-tighter text-slate-900 italic uppercase leading-none tracking-tighter">Nihongono <span className="text-teal-600 tracking-tighter font-black">Sensei</span></h1><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">Welcome, {userName}-san</p></div>
+                            <div><h1 className="text-xl lg:text-2xl font-black tracking-tighter text-slate-900 italic uppercase">Nihongono <span className="text-teal-600">Sensei</span></h1><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">Welcome, {userName}-san</p></div>
                             <div className="flex bg-slate-100 p-1 rounded-xl">
                                 <button onClick={() => setBridge('en')} className={`px-5 py-2 rounded-lg text-[10px] font-black transition-all ${bridge === 'en' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}>EN</button>
                                 <button onClick={() => setBridge('hi')} className={`px-5 py-2 rounded-lg text-[10px] font-black transition-all ${bridge === 'hi' ? 'bg-white shadow-md text-teal-600' : 'text-slate-400'}`}>HI</button>
@@ -158,26 +168,6 @@
 
                         <div className="max-w-7xl mx-auto p-6 lg:p-12 space-y-20">
                             
-                            {/* TAB: CALENDAR */}
-                            {activeTab === 'calendar' && (
-                                <div className="space-y-12 animate-zoom">
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                        <div className="bg-slate-900 p-10 rounded-[3rem] shadow-2xl text-white">
-                                            <h2 className="text-amber-400 font-black text-2xl uppercase mb-8 border-l-4 border-amber-400 pl-4">Months</h2>
-                                            <div className="grid grid-cols-3 gap-3">
-                                                {calendarData.months.map((m, i) => (<div key={i} className="bg-white/5 border border-white/10 p-4 rounded-xl text-center"><p className="text-white/30 text-[9px] font-black uppercase">{m.m}</p><p className={`text-xs font-bold ${m.r.includes('★') ? 'text-teal-400' : 'text-white'}`}>{m.r}</p></div>))}
-                                            </div>
-                                        </div>
-                                        <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl">
-                                            <h2 className="text-teal-600 font-black text-2xl uppercase mb-8 border-l-4 border-teal-600 pl-4">Weekdays</h2>
-                                            <div className="space-y-3">
-                                                {calendarData.weekdays.map((w, i) => (<div key={i} className="flex justify-between p-4 bg-slate-50 rounded-xl font-black italic uppercase"><span>{w.r}</span><span className="text-slate-300 tracking-widest text-[10px]">{bridge === 'en' ? w.en : w.hi}</span></div>))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
                             {/* TAB: NUMBERS */}
                             {activeTab === 'numbers' && (
                                 <div className="space-y-12 animate-zoom">
@@ -186,7 +176,7 @@
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
                                             <div className="space-y-6">
                                                 <p className="text-white/40 font-black text-[10px] uppercase tracking-widest border-b border-white/10 pb-2">Hours (Ji)</p>
-                                                <div className="grid grid-cols-5 gap-2">{clockData.hours.map((h, i) => (<div key={i} className="bg-white/5 border border-white/10 p-3 rounded-xl text-center"><p className="text-white/20 text-[8px] font-black">{i+1}</p><p className={`text-[10px] font-bold ${h.includes('★') ? 'text-teal-400' : 'text-white'}`}>{h.split(' ')[0]}</p></div>))}</div>
+                                                <div className="grid grid-cols-5 gap-2">{clockData.hours.map((h, i) => (<div key={i} className="bg-white/5 border border-white/10 p-3 rounded-xl text-center"><p className="text-white/20 text-[8px] font-black">{i+1}</p><p className={`text-[10px] font-bold ${h.includes('★') ? 'text-rose-400' : 'text-white'}`}>{h.split(' ')[0]}</p></div>))}</div>
                                             </div>
                                             <div className="space-y-6">
                                                 <p className="text-white/40 font-black text-[10px] uppercase tracking-widest border-b border-white/10 pb-2">Minutes (Pun/Fun)</p>
@@ -194,62 +184,29 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {bigCounters.map((group, i) => (
                                             <div key={i} className="bg-white p-10 rounded-[3.5rem] border border-slate-100 shadow-xl flex flex-col justify-between h-72">
-                                                <div><h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tighter mb-2">{group.title}</h3><p className="text-slate-400 text-xs font-bold mb-6">{group.logic}</p><div className="flex flex-wrap gap-2">{group.items.map((it, j) => (<span key={j} className="px-4 py-2 rounded-xl text-xs font-bold border italic bg-slate-50 text-slate-600">{it}</span>))}</div></div>
-                                                <p className="text-teal-600 font-black text-[10px] uppercase tracking-widest border-t pt-4">Ex: {group.ex}</p>
+                                                <div><h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tighter mb-2">{group.title}</h3><p className="text-slate-400 text-xs font-bold leading-relaxed mb-6">{group.logic}</p><div className="flex flex-wrap gap-2">{group.items.map((it, j) => (<span key={j} className="px-4 py-2 rounded-xl text-xs font-bold border italic bg-slate-50 text-slate-600">{it}</span>))}</div></div>
+                                                <p className="text-teal-600 font-black text-[10px] uppercase tracking-widest border-t pt-4 italic">Ex: {pEx(group.ex)}</p>
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-                            )}
 
-                            {/* TAB: PARTICLES */}
-                            {activeTab === 'particles' && (
-                                <div className="space-y-20 animate-zoom">
-                                    {particleGroups.map((group, idx) => (
-                                        <div key={idx} className="space-y-6">
-                                            <h2 className="text-2xl font-black text-slate-900 italic uppercase border-l-4 border-teal-500 pl-4">{group.title}</h2>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                {group.items.map((item, i) => (
-                                                    <button key={i} onClick={() => setSelected({type: 'particle', data: item})} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left h-56 relative overflow-hidden flex flex-col justify-between">
-                                                        <div className="absolute top-0 right-0 p-10 text-slate-50 font-black text-8xl italic leading-none">{item.p}</div>
-                                                        <div className="relative z-10"><p className="text-[10px] font-black text-teal-600 uppercase mb-1">{item.label}</p><h3 className="text-4xl font-black text-slate-900 italic uppercase tracking-tighter">{item.p}</h3></div>
-                                                        <p className="text-slate-500 font-extrabold text-xs relative z-10">{bridge === 'en' ? item.en : item.hi}</p>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    <div className="space-y-6">
-                                        <h2 className="text-2xl font-black text-slate-900 italic uppercase border-l-4 border-amber-500 pl-4">Face-Offs</h2>
-                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                            {multitaskers.map((mt, i) => (
-                                                <button key={i} onClick={() => setSelected({type: 'multitask', data: mt})} className="battle-gradient p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group text-left transition-all hover:scale-[1.01]"><div className="absolute -right-6 -top-6 text-white/5 text-[150px] font-black italic leading-none">{mt.p.split(' ')[0]}</div><div className="relative z-10 space-y-4"><p className="text-amber-400 font-black text-[10px] uppercase tracking-[0.2em]">{mt.title}</p><h3 className="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{mt.p}</h3></div></button>
+                                    <div className="bg-teal-600 p-10 rounded-[3rem] text-white relative overflow-hidden">
+                                        <div className="absolute right-0 top-0 p-10 opacity-10"><span className="material-icons text-[150px]">emoji_objects</span></div>
+                                        <h3 className="text-2xl font-black uppercase mb-8 italic tracking-tighter">Digital Wordplay & Puns</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                                            {numberPuns.map((pun, i) => (
+                                                <div key={i} className="bg-white/10 p-6 rounded-[2rem] backdrop-blur-sm border border-white/10">
+                                                    <p className="text-4xl font-black mb-1">{pun.n}</p>
+                                                    <p className="text-[10px] font-black uppercase opacity-60">{pun.r}</p>
+                                                    <p className="text-sm font-bold mt-3 leading-none">{pun.m}</p>
+                                                    <p className="text-[9px] mt-4 opacity-40 leading-tight">{pun.logic}</p>
+                                                </div>
                                             ))}
                                         </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* TAB: SPATIAL */}
-                            {activeTab === 'kosoado' && (
-                                <div className="animate-zoom bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden">
-                                    <div className="overflow-x-auto no-scrollbar">
-                                        <table className="w-full text-left min-w-[800px]">
-                                            <thead className="bg-slate-950 text-white text-[10px] uppercase font-black tracking-widest">
-                                                <tr><th className="p-10">Type</th><th className="p-10 text-rose-400 italic">KO</th><th className="p-10 text-blue-400 italic">SO</th><th className="p-10 text-emerald-400 italic">A</th><th className="p-10 text-amber-400 italic">DO</th></tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-100 font-bold">
-                                                {kosoadoTable.map((obj, i) => (
-                                                    <tr key={i} className="hover:bg-teal-50/50 transition-colors">
-                                                        <td className="p-10 bg-slate-50 border-r border-slate-100"><p className="text-xs font-black text-slate-900 uppercase leading-none">{obj.title}</p></td>
-                                                        {obj.row.map((word, j) => (<td key={j} className="p-4"><button onClick={() => setSelected({type: 'spatial', id: word})} className="w-full py-8 rounded-2xl hover:bg-white hover:shadow-xl hover:text-teal-600 font-black text-2xl italic uppercase tracking-tighter transition-all">{word}</button></td>))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
                                     </div>
                                 </div>
                             )}
@@ -259,23 +216,102 @@
                                 <div className="space-y-16 animate-zoom">
                                     {verbGroups.map((group, idx) => (
                                         <div key={idx} className="space-y-6">
-                                            <h2 className="text-2xl font-black text-slate-900 italic uppercase border-l-4 border-rose-500 pl-4">{group.title}</h2>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div className="flex items-center gap-4 mb-4">
+                                                <div className="w-1 bg-teal-500 h-10 rounded-full"></div>
+                                                <h2 className="text-2xl font-black text-slate-900 italic uppercase tracking-tighter">{group.title} <span className="text-slate-300 ml-2 font-normal italic">({group.rule})</span></h2>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {group.verbs.map((v, i) => (
-                                                    <button key={i} onClick={() => setSelected({type: 'verb', data: v})} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl text-left"><h3 className="text-4xl font-black text-slate-900 italic leading-none">{v.dict}</h3><p className="text-slate-400 font-extrabold text-sm uppercase mt-4 italic">{bridge === 'en' ? v.en : v.hi}</p><p className="text-xs text-rose-500 font-black mt-1 italic uppercase tracking-widest">Polite: {v.polite}</p></button>
+                                                    <button key={i} onClick={() => setSelected({type: 'verb', data: v})} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left flex flex-col justify-between h-52 group">
+                                                        <div>
+                                                            <div className="flex justify-between items-start">
+                                                                <h3 className="text-3xl font-black text-slate-900 italic tracking-tighter group-hover:text-teal-600 transition-colors leading-none">{v.dict}</h3>
+                                                                <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">{v.polite}</span>
+                                                            </div>
+                                                            <p className="text-slate-400 font-extrabold text-sm uppercase mt-4">{bridge === 'en' ? v.en : v.hi}</p>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-[9px] font-black text-slate-300 uppercase tracking-widest"><span className="material-icons text-xs">touch_app</span> Details</div>
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             )}
+
+                            {/* TAB: CALENDAR */}
+                            {activeTab === 'calendar' && (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-zoom">
+                                    <div className="bg-slate-900 p-10 rounded-[3rem] shadow-2xl text-white">
+                                        <h2 className="text-amber-400 font-black text-2xl uppercase italic mb-8 border-l-4 border-amber-400 pl-4">Months</h2>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {calendarData.months.map((m, i) => (<div key={i} className="bg-white/5 border border-white/10 p-4 rounded-xl font-bold flex justify-between"><span className="opacity-40">{m.m}</span><span>{m.r}</span></div>))}
+                                        </div>
+                                    </div>
+                                    <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl">
+                                        <h2 className="text-teal-600 font-black text-2xl uppercase italic mb-8 border-l-4 border-teal-600 pl-4">Weekdays</h2>
+                                        <div className="space-y-3">
+                                            {calendarData.weekdays.map((w, i) => (<div key={i} className="flex justify-between p-4 bg-slate-50 rounded-xl font-black italic uppercase"><span>{w.r}</span><span className="text-slate-300 tracking-widest text-[10px]">{bridge === 'en' ? w.en : w.hi}</span></div>))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* TAB: PARTICLES & SPATIAL (Kept for completeness) */}
+                            {activeTab === 'particles' && (
+                                <div className="space-y-16 animate-zoom">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {particleGroups[0].items.map((item, i) => (
+                                            <button key={i} onClick={() => setSelected({type: 'particle', data: item})} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left h-52 flex flex-col justify-between">
+                                                <div>
+                                                    <p className="text-[10px] font-black text-teal-600 uppercase mb-2">{item.label}</p>
+                                                    <h3 className="text-5xl font-black text-slate-900 italic uppercase leading-none tracking-tighter">{item.p}</h3>
+                                                </div>
+                                                <p className="text-slate-500 font-extrabold text-xs">{bridge === 'en' ? item.en : item.hi}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        {multitaskers.map((mt, i) => (
+                                            <button key={i} onClick={() => setSelected({type: 'multitask', data: mt})} className="battle-gradient p-10 rounded-[3rem] shadow-2xl relative overflow-hidden text-left text-white hover:scale-[1.01] transition-transform">
+                                                <div className="absolute -right-6 -top-6 text-white/5 text-[150px] font-black italic leading-none">{mt.p.split(' ')[0]}</div>
+                                                <div className="relative z-10 space-y-4">
+                                                    <p className="text-amber-400 font-black text-[10px] uppercase tracking-[0.2em]">{mt.title}</p>
+                                                    <h3 className="text-4xl font-black italic tracking-tighter uppercase leading-none">{mt.p}</h3>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'kosoado' && (
+                                <div className="animate-zoom bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden">
+                                    <div className="overflow-x-auto no-scrollbar">
+                                        <table className="w-full text-left min-w-[800px]">
+                                            <thead className="bg-slate-950 text-white text-[10px] uppercase font-black tracking-widest">
+                                                <tr><th className="p-8">Type</th><th className="p-8 text-rose-400 italic">KO</th><th className="p-8 text-blue-400 italic">SO</th><th className="p-8 text-emerald-400 italic">A</th><th className="p-8 text-amber-400 italic">DO</th></tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100 font-bold">
+                                                {kosoadoTable.map((obj, i) => (
+                                                    <tr key={i} className="hover:bg-teal-50/30 transition-colors">
+                                                        <td className="p-8 bg-slate-50 border-r border-slate-100"><p className="text-xs font-black text-slate-900 uppercase leading-none">{obj.title}</p></td>
+                                                        {obj.row.map((word, j) => (<td key={j} className="p-4"><button className="w-full py-8 rounded-2xl hover:bg-white hover:shadow-xl hover:text-teal-600 font-black text-2xl italic uppercase tracking-tighter transition-all">{word}</button></td>))}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
                     </main>
 
-                    {/* MODAL */}
+                    {/* MODAL SYSTEM */}
                     {selected && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md" onClick={() => setSelected(null)}>
-                            <div className="relative bg-white w-full max-w-xl rounded-[4rem] p-10 lg:p-14 shadow-2xl animate-zoom" onClick={e => e.stopPropagation()}>
+                            <div className="relative bg-white w-full max-w-xl rounded-[4rem] p-12 lg:p-16 shadow-2xl animate-zoom overflow-y-auto max-h-[90vh] no-scrollbar" onClick={e => e.stopPropagation()}>
                                 <button onClick={() => setSelected(null)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-900 transition-colors"><span className="material-icons text-3xl">close</span></button>
                                 {selected.type === 'multitask' && (
                                     <div className="space-y-10">
@@ -292,14 +328,15 @@
                                     <div className="space-y-8">
                                         <h4 className="text-7xl font-black italic text-rose-500 uppercase leading-none tracking-tighter">{selected.data.p}</h4>
                                         <div className="p-8 bg-slate-50 rounded-3xl font-bold text-xl italic text-slate-700">"{selected.data.logic}"</div>
-                                        <div className="p-10 bg-slate-950 text-white rounded-[2.5rem] font-black italic text-2xl italic leading-tight">"{pEx(selected.data.ex)}"</div>
+                                        <div className="p-10 bg-slate-950 text-white rounded-[2.5rem] font-black italic text-2xl leading-tight">"{pEx(selected.data.ex)}"</div>
                                     </div>
                                 )}
-                                {selected.type === 'spatial' && (
-                                    <div className="space-y-8 text-center"><h4 className="text-7xl font-black italic text-rose-500 uppercase leading-none">{selected.id}</h4><div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic font-black text-3xl text-slate-800 leading-tight italic">"{pEx(spatialDetails[selected.id]?.ex || 'Usage card under construction...')}"</div></div>
-                                )}
                                 {selected.type === 'verb' && (
-                                    <div className="space-y-8 text-center"><h4 className="text-7xl font-black italic text-rose-500 leading-none">{selected.data.dict}</h4><div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic font-black text-3xl text-slate-800 leading-tight italic">"{pEx(selected.data.ex)}"</div></div>
+                                    <div className="space-y-8 text-center">
+                                        <h4 className="text-7xl font-black italic text-rose-500 leading-none uppercase">{selected.data.dict}</h4>
+                                        <p className="text-teal-600 font-black text-[11px] uppercase tracking-widest">Polite: {selected.data.polite}</p>
+                                        <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic font-black text-3xl text-slate-800 leading-tight italic">"{pEx(selected.data.ex)}"</div>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -309,7 +346,7 @@
         };
 
         const SidebarBtn = ({ active, icon, label, onClick }) => (
-            <button onClick={onClick} className={`w-full flex flex-col items-center py-4 rounded-3xl transition-all duration-300 ${active ? 'bg-teal-500 text-white shadow-xl' : 'text-slate-500 hover:text-slate-300'}`}>
+            <button onClick={onClick} className={`w-full flex flex-col items-center py-4 rounded-3xl transition-all duration-300 ${active ? 'bg-teal-500 text-white shadow-xl shadow-teal-500/30' : 'text-slate-500 hover:text-slate-300'}`}>
                 <span className="material-icons text-2xl">{icon}</span>
                 <span className="text-[8px] font-black uppercase mt-2 tracking-widest">{label}</span>
             </button>
