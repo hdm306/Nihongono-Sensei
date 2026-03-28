@@ -41,7 +41,6 @@
                 }
             };
 
-            // Helper to replace names in examples
             const personalEx = (text) => {
                 if (!userName) return text;
                 return text.replace(/Himanshu|Tanaka-san|User/g, `${userName}-san`);
@@ -50,7 +49,7 @@
             // --- DATA ENGINE ---
             const particleGroups = [
                 {
-                    groupTitle: "The Big Three",
+                    groupTitle: "Essential Basics",
                     items: [
                         { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...', logic: 'Sets the main stage. Speaking of X...', ex: 'Watashi wa Himanshu desu.' },
                         { p: 'ga', label: 'Subject', en: 'The Actor', hi: 'Karta (ne)', logic: 'Emphasis on WHO is doing the action.', ex: 'Himanshu ga ikimasu.' },
@@ -58,66 +57,56 @@
                     ]
                 },
                 {
-                    groupTitle: "Movement & Direction",
+                    groupTitle: "Movement & Time",
                     items: [
-                        { p: 'ni', label: 'Destination', en: 'To / At', hi: 'Sthan/Samay', logic: 'Focus on the final destination point.', ex: 'Nihon ni ikimasu.' },
-                        { p: 'e', label: 'Direction', en: 'Towards', hi: 'Ki taraf', logic: 'Focus on the heading or journey.', ex: 'Gakkou e ikimasu.' }
+                        { p: 'ni', label: 'Target', en: 'To / At', hi: 'Sthan/Samay', logic: 'Specific point in time or destination.', ex: 'Nihon ni ikimasu.' },
+                        { p: 'e', label: 'Direction', en: 'Towards', hi: 'Ki taraf', logic: 'Heading towards a journey/direction.', ex: 'Gakkou e ikimasu.' },
+                        { p: 'kara', label: 'Start', en: 'From', hi: 'Se (Shuru)', logic: 'The starting point.', ex: 'Indo kara kimashita.' },
+                        { p: 'made', label: 'End', en: 'Until', hi: 'Tak (Ant)', logic: 'The end point.', ex: 'San-ji made hatarakimasu.' },
+                        { p: 'goro', label: 'Approx', en: 'Around', hi: 'Lagbhag', logic: 'Approximate time (about 3:00).', ex: 'San-ji goro ni nemasu.' }
+                    ]
+                },
+                {
+                    groupTitle: "Useful Connectors",
+                    items: [
+                        { p: 'no', label: 'Linker', en: "Possession", hi: 'Ka/Ke/Ki', logic: 'Connects nouns. My book.', ex: 'Watashi no tomodachi.' },
+                        { p: 'mo', label: 'Also', en: 'Too / Also', hi: 'Bhi', logic: 'Inclusion of similar items.', ex: 'Watashi mo ikimasu.' },
+                        { p: 'to', label: 'With', en: 'Together', hi: 'Aur / Saath', logic: 'Doing things with someone or complete lists.', ex: 'Tanaka-san to hanashimasu.' },
+                        { p: 'soshite', label: 'And Then', en: 'Next', hi: 'Aur phir', logic: 'Linking sentences sequentially.', ex: 'Tabemasu. Soshite nemasu.' }
                     ]
                 }
             ];
 
             const multitaskers = [
                 { 
-                    p: 'NI vs DE', 
-                    title: 'The Location Battle', 
-                    logic: 'NI is for "Static" existence (sitting). DE is for "Active" events (working).',
-                    compare: [
-                        { side: 'NI (Static)', desc: 'Just being there', ex: 'Isu NI suwaru.' },
-                        { side: 'DE (Active)', desc: 'Doing a task', ex: 'Resutoran DE taberu.' }
+                    p: 'de', title: 'The Multi-Tool', 
+                    logic: 'Place of Action, Tools (by car), or Totals.',
+                    roles: [
+                        { name: 'Location', desc: 'Active place', ex: 'Resutoran DE taberu.' },
+                        { name: 'Tool', desc: 'Means of action', ex: 'Kuruma DE ikimasu.' }
                     ]
                 },
                 { 
-                    p: 'WA vs GA', 
-                    title: 'The Emphasis Duel', 
-                    logic: 'WA focuses on the info. GA focuses on the specific actor.',
+                    p: 'NI vs DE', title: 'Location Logic', 
+                    logic: 'NI for being/sitting. DE for doing/acting.',
                     compare: [
-                        { side: 'WA (General)', desc: 'Focus on action', ex: 'Tanaka-san wa yasashii.' },
-                        { side: 'GA (Specific)', desc: 'Focus on person', ex: 'Tanaka-san ga kita!' }
+                        { side: 'NI', desc: 'Existence', ex: 'Koko ni imasu.' },
+                        { side: 'DE', desc: 'Action', ex: 'Koko de benkyou suru.' }
                     ]
                 }
             ];
 
-            const kosoado = [
-                { id: 'item', title: "Objects", row: ["kore", "sore", "are", "dore"], logic: "Pronouns" },
-                { id: 'place', title: "Places", row: ["koko", "soko", "asoko", "doko"], logic: "Locations" }
-            ];
-
-            const spatialDetails = {
-                kore: { en: "This", hi: "Yeh", logic: "Near speaker.", ex: "Kore wa Himanshu no pen desu." },
-                sore: { en: "That", hi: "Woh", logic: "Near listener.", ex: "Sore wa nan desu ka?" },
-                koko: { en: "Here", hi: "Yahan", logic: "Current spot.", ex: "Koko wa Himanshu no uchi desu." }
-            };
-
             // Welcome Screen
             if (!userName) {
                 return (
-                    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
-                        <div className="max-w-md w-full bg-white rounded-[3rem] p-10 shadow-2xl animate-zoom text-center">
-                            <div className="w-20 h-20 bg-rose-500 rounded-3xl flex items-center justify-center text-white mx-auto mb-8 shadow-xl">
-                                <span className="material-icons text-4xl font-black">face</span>
-                            </div>
-                            <h2 className="text-3xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">Konnichiwa!</h2>
-                            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-4 mb-8">Enter your name to personalize examples</p>
+                    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-center">
+                        <div className="max-w-md w-full bg-white rounded-[3rem] p-10 shadow-2xl animate-zoom">
+                            <div className="w-16 h-16 bg-rose-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-6"><span className="material-icons text-3xl">school</span></div>
+                            <h2 className="text-2xl font-black text-slate-900 uppercase italic">Konnichiwa!</h2>
+                            <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-2 mb-8">Personalize your Japanese lab</p>
                             <form onSubmit={handleNameSubmit} className="space-y-4">
-                                <input 
-                                    type="text" 
-                                    placeholder="Your Name..." 
-                                    className="w-full bg-slate-100 border-none py-5 px-8 rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-rose-500/10 transition-all text-center"
-                                    value={tempName}
-                                    onChange={(e) => setTempName(e.target.value)}
-                                    autoFocus
-                                />
-                                <button className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-rose-600 transition-all">Start Learning</button>
+                                <input type="text" placeholder="Enter Name..." className="w-full bg-slate-100 py-4 px-6 rounded-xl text-lg font-bold outline-none text-center" value={tempName} onChange={(e) => setTempName(e.target.value)} autoFocus />
+                                <button className="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-rose-600 transition-all">Start</button>
                             </form>
                         </div>
                     </div>
@@ -126,27 +115,23 @@
 
             return (
                 <div className="min-h-screen flex flex-col lg:flex-row">
-                    {/* SIDEBAR */}
-                    <aside className="hidden lg:flex w-24 bg-slate-950 flex-col items-center py-10 gap-10 fixed h-full z-50">
+                    <aside className="hidden lg:flex w-24 bg-slate-950 flex-col items-center py-10 gap-10 fixed h-full z-50 shadow-2xl">
                         <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg text-xl">N</div>
                         <nav className="flex flex-col gap-8">
                             <SidebarBtn active={activeTab === 'particles'} icon="layers" onClick={() => setActiveTab('particles')} />
-                            <SidebarBtn active={activeTab === 'kosoado'} icon="map" onClick={() => setActiveTab('kosoado')} />
-                            <SidebarBtn active={activeTab === 'numbers'} icon="tag" onClick={() => setActiveTab('numbers')} />
-                            <SidebarBtn active={activeTab === 'verbs'} icon="bolt" onClick={() => setActiveTab('verbs')} />
+                            <SidebarBtn icon="map" onClick={() => setActiveTab('kosoado')} />
+                            <SidebarBtn icon="tag" onClick={() => setActiveTab('numbers')} />
+                            <SidebarBtn icon="bolt" onClick={() => setActiveTab('verbs')} />
                         </nav>
                         <button onClick={() => {localStorage.clear(); window.location.reload();}} className="mt-auto text-slate-600 hover:text-rose-500"><span className="material-icons">logout</span></button>
                     </aside>
 
                     <main className="flex-1 lg:ml-24 pb-24">
                         <header className="sticky top-0 z-40 glass border-b border-slate-100 px-6 lg:px-12 py-6 flex justify-between items-center">
-                            <div>
-                                <h1 className="text-xl lg:text-2xl font-extrabold tracking-tighter text-slate-900 italic uppercase">Nihongono <span className="text-rose-500 font-black">Sensei</span></h1>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1 italic">Welcome back, {userName}!</p>
-                            </div>
-                            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-                                <button onClick={() => setBridge('en')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'en' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}>EN</button>
-                                <button onClick={() => setBridge('hi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'hi' ? 'bg-white shadow-md text-rose-500' : 'text-slate-400'}`}>HI</button>
+                            <h1 className="text-xl lg:text-2xl font-extrabold tracking-tighter text-slate-900 italic uppercase">Nihongono <span className="text-rose-500 font-black">Sensei</span></h1>
+                            <div className="flex bg-slate-100 p-1 rounded-xl">
+                                <button onClick={() => setBridge('en')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black ${bridge === 'en' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}>EN</button>
+                                <button onClick={() => setBridge('hi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black ${bridge === 'hi' ? 'bg-white shadow-md text-rose-500' : 'text-slate-400'}`}>HI</button>
                             </div>
                         </header>
 
@@ -161,7 +146,7 @@
                                                     <button key={i} onClick={() => setSelected({type: 'particle', data: item})} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left h-56 relative overflow-hidden">
                                                         <div className="absolute top-0 right-0 p-10 text-slate-50 font-black text-9xl italic group-hover:text-rose-50 uppercase leading-none">{item.p}</div>
                                                         <div className="relative z-10">
-                                                            <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-none mb-1">{item.label}</p>
+                                                            <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">{item.label}</p>
                                                             <h3 className="text-4xl font-black text-slate-900 italic uppercase mt-1 tracking-tighter group-hover:text-rose-600 transition-colors leading-none">{item.p}</h3>
                                                         </div>
                                                         <p className="text-slate-500 font-extrabold text-sm relative z-10 mt-auto">{bridge === 'en' ? item.en : item.hi}</p>
@@ -172,46 +157,18 @@
                                     ))}
 
                                     <div className="space-y-6">
-                                        <h2 className="text-2xl font-black text-slate-900 italic uppercase border-l-4 border-amber-500 pl-4">Multitaskers & Confusions</h2>
+                                        <h2 className="text-2xl font-black text-slate-900 italic uppercase border-l-4 border-amber-500 pl-4">Mastery</h2>
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                             {multitaskers.map((mt, i) => (
                                                 <button key={i} onClick={() => setSelected({type: 'multitask', data: mt})} className="battle-gradient p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group text-left transition-all hover:scale-[1.01]">
-                                                    <div className="absolute -right-6 -top-6 text-white/5 text-[150px] font-black italic select-none group-hover:text-white/10 transition-colors">{mt.p.split(' ')[0]}</div>
-                                                    <div className="relative z-10 space-y-8">
-                                                        <div>
-                                                            <p className="text-amber-400 font-black text-[10px] uppercase tracking-[0.2em] mb-2">{mt.title}</p>
-                                                            <h3 className="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{mt.p}</h3>
-                                                        </div>
-                                                        <div className="flex items-center gap-2 text-white/40 text-[9px] font-black uppercase tracking-widest"><span className="material-icons text-xs">touch_app</span> Explore Personal Logic</div>
+                                                    <div className="absolute -right-6 -top-6 text-white/5 text-[150px] font-black italic select-none uppercase leading-none">{mt.p.split(' ')[0]}</div>
+                                                    <div className="relative z-10 space-y-4">
+                                                        <p className="text-amber-400 font-black text-[10px] uppercase tracking-[0.2em]">{mt.title}</p>
+                                                        <h3 className="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{mt.p}</h3>
                                                     </div>
                                                 </button>
                                             ))}
                                         </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'kosoado' && (
-                                <div className="animate-zoom bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden">
-                                    <div className="overflow-x-auto no-scrollbar">
-                                        <table className="w-full text-left min-w-[800px]">
-                                            <thead className="bg-slate-950 text-white text-[10px] uppercase font-black tracking-widest">
-                                                <tr><th className="p-8">Category</th><th className="p-8 text-rose-400 font-black italic">KO</th><th className="p-8 text-blue-400 font-black italic">SO</th><th className="p-8 text-emerald-400 font-black italic">A</th><th className="p-8 text-amber-400 font-black italic">DO</th></tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-100 font-bold">
-                                                {kosoado.map((obj, i) => (
-                                                    <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                                        <td className="p-8 bg-slate-50 border-r border-slate-100">
-                                                            <p className="text-xs font-black text-slate-900 uppercase leading-none">{obj.title}</p>
-                                                            <p className="text-[9px] mt-2 text-slate-400 font-bold uppercase tracking-widest">{obj.logic}</p>
-                                                        </td>
-                                                        {obj.row.map((word, j) => (
-                                                            <td key={j} className="p-4"><button onClick={() => setSelected({type: 'spatial', id: word})} className="w-full py-8 rounded-2xl hover:bg-rose-50 hover:text-rose-600 font-black text-2xl italic uppercase tracking-tighter transition-all">{word}</button></td>
-                                                        ))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
                                     </div>
                                 </div>
                             )}
@@ -221,14 +178,14 @@
                     {/* MODAL SYSTEM */}
                     {selected && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md" onClick={() => setSelected(null)}>
-                            <div className="relative bg-white w-full max-w-xl rounded-[3.5rem] p-10 lg:p-14 shadow-2xl animate-zoom" onClick={e => e.stopPropagation()}>
-                                <button onClick={() => setSelected(null)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-900 transition-colors"><span className="material-icons text-3xl">close</span></button>
+                            <div className="relative bg-white w-full max-w-xl rounded-[3.5rem] p-10 lg:p-14 shadow-2xl animate-zoom overflow-y-auto max-h-[90vh] no-scrollbar" onClick={e => e.stopPropagation()}>
+                                <button onClick={() => setSelected(null)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-900"><span className="material-icons text-3xl">close</span></button>
                                 
                                 {selected.type === 'multitask' && (
                                     <div className="space-y-10">
-                                        <div className="bg-slate-900 p-10 rounded-[2.5rem] text-center">
+                                        <div className="bg-slate-900 p-8 rounded-[2rem] text-center">
                                             <h4 className="text-6xl font-black text-amber-400 italic tracking-tighter uppercase leading-none">{selected.data.p}</h4>
-                                            <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-6 italic">Mastery for {userName}</p>
+                                            <p className="text-white/40 font-black uppercase text-[9px] tracking-widest mt-4">For {userName}</p>
                                         </div>
                                         <div className="grid grid-cols-1 gap-3">
                                             {(selected.data.roles || selected.data.compare).map((item, j) => (
@@ -249,38 +206,16 @@
                                         <div className="p-10 bg-slate-950 text-white rounded-[2.5rem] font-black italic text-2xl leading-tight">"{personalEx(selected.data.ex)}"</div>
                                     </div>
                                 )}
-
-                                {selected.type === 'spatial' && spatialDetails[selected.id] && (
-                                    <div className="space-y-8">
-                                        <h4 className="text-7xl font-black italic text-rose-500 leading-none tracking-tighter uppercase">{selected.id}</h4>
-                                        <div className="p-8 bg-slate-50 rounded-3xl font-bold text-xl text-slate-700 leading-snug">Logic: {spatialDetails[selected.id].logic}</div>
-                                        <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100 text-2xl font-black italic text-rose-900 leading-tight">"{personalEx(spatialDetails[selected.id].ex)}"</div>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     )}
-
-                    {/* MOBILE NAV */}
-                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-950 px-10 py-5 rounded-full shadow-2xl flex gap-10 lg:hidden z-50">
-                        <MobileBtn active={activeTab === 'particles'} icon="layers" onClick={() => setActiveTab('particles')} />
-                        <MobileBtn active={activeTab === 'kosoado'} icon="map" onClick={() => setActiveTab('kosoado')} />
-                        <MobileBtn active={activeTab === 'numbers'} icon="tag" onClick={() => setActiveTab('numbers')} />
-                        <MobileBtn active={activeTab === 'verbs'} icon="bolt" onClick={() => setActiveTab('verbs')} />
-                    </nav>
                 </div>
             );
         };
 
         const SidebarBtn = ({ active, icon, onClick }) => (
-            <button onClick={onClick} className={`p-4 rounded-2xl transition-all duration-300 ${active ? 'bg-rose-500 text-white shadow-xl shadow-rose-500/30' : 'text-slate-500 hover:text-slate-300'}`}>
+            <button onClick={onClick} className={`p-4 rounded-2xl transition-all duration-300 ${active ? 'bg-rose-500 text-white shadow-xl' : 'text-slate-500 hover:text-slate-300'}`}>
                 <span className="material-icons text-3xl">{icon}</span>
-            </button>
-        );
-
-        const MobileBtn = ({ active, icon, onClick }) => (
-            <button onClick={onClick} className={`transition-all duration-300 ${active ? 'text-rose-500 scale-125' : 'text-slate-500'}`}>
-                <span className="material-icons text-2xl">{icon}</span>
             </button>
         );
 
