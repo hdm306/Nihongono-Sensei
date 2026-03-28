@@ -10,31 +10,11 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'ja,hi,en',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-            }, 'google_translate_element');
-        }
-    </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; top: 0 !important; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; }
         .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(14px); }
-        .goog-te-banner-frame.skiptranslate { display: none !important; } 
-        /* Hiding the Google Translate Top Bar for a cleaner UI */
-        .goog-te-gadget-simple {
-            background-color: #F1F5F9 !important;
-            border: 1px solid #E2E8F0 !important;
-            padding: 8px 12px !important;
-            border-radius: 12px !important;
-            font-size: 10px !important;
-            font-weight: bold !important;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-zoom { animation: zoomIn 0.3s ease-out; }
     </style>
@@ -50,13 +30,13 @@
             const [bridge, setBridge] = useState('en');
             const [selected, setSelected] = useState(null);
 
-            // DATA
+            // --- DATA ---
             const particles = [
-                { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...', logic: 'Sets the main topic.' },
-                { p: 'ga', label: 'Subject', en: 'The actor.', hi: 'Karta (ne)', logic: 'Pinpoints specific subject.' },
+                { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...', logic: 'Sets the main topic of your sentence.' },
+                { p: 'ga', label: 'Subject', en: 'The actor.', hi: 'Karta (ne)', logic: 'Pinpoints the specific subject.' },
                 { p: 'o', label: 'Object', en: 'The target.', hi: 'Karma (ko)', logic: 'The thing being acted upon.' },
-                { p: 'ni', label: 'Target/Time', en: 'At / To', hi: 'Sthan/Samay', logic: 'Destination or time.' },
-                { p: 'de', label: 'Location', en: 'Action place', hi: 'Kriya sthan', logic: 'Where action happens.' },
+                { p: 'ni', label: 'Target/Time', en: 'At / To', hi: 'Sthan/Samay', logic: 'Destination or specific time.' },
+                { p: 'de', label: 'Location', en: 'Action place', hi: 'Kriya sthan', logic: 'Where the action happens.' },
                 { p: 'no', label: 'Possession', en: "X's Y", hi: 'Ka/Ke/Ki', logic: 'Connects two nouns.' }
             ];
 
@@ -70,28 +50,28 @@
             const spatialDetails = {
                 kore: { en: "This (near me)", hi: "Yeh (paas)", ex: "Kore wa hon desu.", logic: "For items you touch." },
                 sore: { en: "That (near you)", hi: "Woh (aapke paas)", ex: "Sore wa nan desu ka?", logic: "For items near listener." },
-                are: { en: "That far away", hi: "Woh door wala", ex: "Are wa yama desu.", logic: "Far from both." },
+                are: { en: "That far away", hi: "Woh door wala", ex: "Are wa yama desu.", logic: "Far from both people." },
                 dore: { en: "Which one?", hi: "Kaunsa?", ex: "Dore desu ka?", logic: "Questioning objects." },
-                koko: { en: "Here", hi: "Yahan", ex: "Koko desu.", logic: "Current spot." },
-                soko: { en: "There", hi: "Wahan", ex: "Soko ni.", logic: "Listener's spot." },
-                asoko: { en: "Over there", hi: "Door wahan", ex: "Asoko desu.", logic: "Distant spot." },
+                koko: { en: "Here", hi: "Yahan", ex: "Koko desu.", logic: "This spot right here." },
+                soko: { en: "There", hi: "Wahan", ex: "Soko ni.", logic: "Spot near the listener." },
+                asoko: { en: "Over there", hi: "Door wahan", ex: "Asoko desu.", logic: "A distant spot." },
                 doko: { en: "Where?", hi: "Kahan?", ex: "Doko desu ka?", logic: "Asking location." },
-                kono: { en: "This [X]", hi: "Yeh [X]", ex: "Kono hon.", logic: "Must follow with noun." },
-                sono: { en: "That [X]", hi: "Woh [X]", ex: "Sono pen.", logic: "Noun near listener." },
-                ano: { en: "That far [X]", hi: "Woh door [X]", ex: "Ano hito.", logic: "Noun far away." },
-                dono: { en: "Which [X]?", hi: "Kaunsa [X]?", ex: "Dono kutsu?", logic: "Asking 'Which [X]?'" },
-                kochira: { en: "This way", hi: "Is taraf", ex: "Kochira e.", logic: "Polite direction." },
-                sochira: { en: "That way", hi: "Us taraf", ex: "Sochira e.", logic: "Listener's direction." },
+                kono: { en: "This [Noun]", hi: "Yeh [Noun]", ex: "Kono hon.", logic: "Must follow with a noun." },
+                sono: { en: "That [Noun]", hi: "Woh [Noun]", ex: "Sono pen.", logic: "Noun near the listener." },
+                ano: { en: "That far [Noun]", hi: "Woh door [Noun]", ex: "Ano hito.", logic: "Noun far from everyone." },
+                dono: { en: "Which [Noun]?", hi: "Kaunsa [Noun]?", ex: "Dono kutsu?", logic: "Asking 'Which [X]?'" },
+                kochira: { en: "This way", hi: "Is taraf", ex: "Kochira e.", logic: "Polite direction/person near me." },
+                sochira: { en: "That way", hi: "Us taraf", ex: "Sochira e.", logic: "Direction near listener." },
                 achira: { en: "Far way", hi: "Door taraf", ex: "Achira e.", logic: "Distant direction." },
-                dochira: { en: "Which way?", hi: "Kis taraf?", ex: "Dochira?", logic: "Asking direction." }
+                dochira: { en: "Which way?", hi: "Kis taraf?", ex: "Dochira?", logic: "Asking direction (polite)." }
             };
 
             const counters = [
                 { title: 'General (-tsu)', items: ['hitotsu', 'futatsu', 'mittsu', 'yottsu', 'itsutsu', 'muttsu', 'nanatsu', 'yattsu', 'kokonotsu', 'tooo'] },
                 { title: 'People (-nin)', items: ['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★', 'go-nin', 'roku-nin', 'shichi-nin'] },
                 { title: 'Time (-ji)', items: ['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji'] },
-                { title: 'Small (-ko)', items: ['ikko', 'niko', 'sanko', 'yonko', 'goko', 'rokko'] },
-                { title: 'Flat (-mai)', items: ['ichimai', 'nimai', 'sanmai', 'yonmai', 'gomai'] },
+                { title: 'Small Items (-ko)', items: ['ikko', 'niko', 'sanko', 'yonko', 'goko', 'rokko'] },
+                { title: 'Flat Objects (-mai)', items: ['ichimai', 'nimai', 'sanmai', 'yonmai', 'gomai'] },
                 { title: 'Animals (-piki)', items: ['ippiki ★', 'nihiki', 'sanbiki ★', 'yonhiki', 'gohiki'] }
             ];
 
@@ -109,208 +89,4 @@
                     
                     {/* SIDEBAR */}
                     <aside className="hidden lg:flex w-24 bg-slate-950 flex-col items-center py-10 gap-10 fixed h-full z-50 shadow-2xl">
-                        <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg shadow-rose-500/20 text-xl">N</div>
-                        <nav className="flex flex-col gap-8">
-                            <SidebarBtn active={activeTab === 'particles'} icon="layers" onClick={() => setActiveTab('particles')} />
-                            <SidebarBtn active={activeTab === 'kosoado'} icon="map" onClick={() => setActiveTab('kosoado')} />
-                            <SidebarBtn active={activeTab === 'numbers'} icon="tag" onClick={() => setActiveTab('numbers')} />
-                            <SidebarBtn active={activeTab === 'verbs'} icon="bolt" onClick={() => setActiveTab('verbs')} />
-                        </nav>
-                    </aside>
-
-                    {/* MAIN */}
-                    <main className="flex-1 lg:ml-24 pb-24 lg:pb-10">
-                        <header className="sticky top-0 z-40 glass border-b border-slate-100 px-6 lg:px-12 py-6 flex flex-wrap justify-between items-center gap-4">
-                            <div>
-                                <h1 className="text-xl lg:text-2xl font-extrabold tracking-tighter text-slate-900 italic uppercase leading-none">Nihongono <span className="text-rose-500 font-black">Sensei</span></h1>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">By Japa & Himanshu</p>
-                            </div>
-
-                            {/* GOOGLE TRANSLATE BOX */}
-                            <div className="flex-1 max-w-sm flex items-center justify-center">
-                                <div id="google_translate_element"></div>
-                            </div>
-                            
-                            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-                                <button onClick={() => setBridge('en')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'en' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}>EN</button>
-                                <button onClick={() => setBridge('hi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'hi' ? 'bg-white shadow-md text-rose-500' : 'text-slate-400'}`}>HI</button>
-                            </div>
-                        </header>
-
-                        <div className="max-w-7xl mx-auto p-6 lg:p-12">
-                            {activeTab === 'particles' && (
-                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <SectionHeader title="Essential Particles" sub="The Logic of Sentences" />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {particles.map((item, i) => (
-                                            <Card key={i} item={item} bridge={bridge} onClick={() => setSelected({type: 'particle', data: item})} />
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'kosoado' && (
-                                <div className="animate-in fade-in duration-500">
-                                    <SectionHeader title="Spatial Logic" sub="Do-Ko-A-So Pronouns" />
-                                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden">
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-left border-collapse min-w-[800px]">
-                                                <thead className="bg-slate-950 text-white text-[10px] uppercase tracking-widest font-black">
-                                                    <tr>
-                                                        <th className="p-8">Logic Grid</th>
-                                                        <th className="p-8 text-rose-400">KO (Near)</th>
-                                                        <th className="p-8 text-blue-400">SO (Mid)</th>
-                                                        <th className="p-8 text-emerald-400">A (Far)</th>
-                                                        <th className="p-8 text-amber-400">DO (?)</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-slate-100 font-bold">
-                                                    {kosoado.map((obj, i) => (
-                                                        <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                                            <td className="p-8 bg-slate-50/30 text-xs uppercase text-slate-400 tracking-widest">{obj.title}</td>
-                                                            {obj.row.map((word, j) => (
-                                                                <td key={j} className="p-4 text-center">
-                                                                    <button onClick={() => setSelected({type: 'spatial', id: word})} className="w-full py-8 rounded-2xl hover:bg-rose-50 hover:text-rose-500 transition-all text-xl italic font-black uppercase tracking-tighter">{word}</button>
-                                                                </td>
-                                                            ))}
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'numbers' && (
-                                <div className="animate-in fade-in duration-500">
-                                    <SectionHeader title="Counting & Time" sub="Special Japanese Counters" />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                        {counters.map((group, i) => (
-                                            <div key={i} className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-lg transition-all">
-                                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8">{group.title}</h3>
-                                                <div className="flex flex-wrap gap-2.5">
-                                                    {group.items.map((it, j) => (
-                                                        <span key={j} className={`px-4 py-2 rounded-xl text-xs font-bold italic border ${it.includes('★') ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-slate-50 border-slate-100 text-slate-600'}`}>{it}</span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'verbs' && (
-                                <div className="animate-in fade-in duration-500">
-                                    <SectionHeader title="Mastering Verbs" sub="Action Words" />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {verbs.map((v, i) => (
-                                            <button key={i} onClick={() => setSelected({type: 'verb', data: v})} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left flex flex-col justify-between h-56 overflow-hidden relative">
-                                                <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-bl-full group-hover:bg-rose-50 transition-colors"></div>
-                                                <div className="relative z-10">
-                                                    <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">{v.group}</span>
-                                                    <h3 className="text-4xl font-black text-slate-900 italic tracking-tighter group-hover:text-rose-600 leading-none mt-1">{v.dict}</h3>
-                                                </div>
-                                                <div className="relative z-10">
-                                                    <p className="text-slate-500 font-extrabold text-sm uppercase">{bridge === 'en' ? v.en : v.hi}</p>
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </main>
-
-                    {/* MODAL SYSTEM */}
-                    {selected && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-                            <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setSelected(null)}></div>
-                            <div className="relative bg-white w-full max-w-xl rounded-[3.5rem] p-10 lg:p-14 shadow-2xl animate-zoom">
-                                <button onClick={() => setSelected(null)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-900 transition-colors"><span className="material-icons text-3xl">close</span></button>
-                                
-                                {selected.type === 'spatial' && (
-                                    <div className="space-y-8">
-                                        <h4 className="text-7xl font-black text-rose-500 italic uppercase tracking-tighter leading-none">{selected.id}</h4>
-                                        <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
-                                            <p className="text-xs font-black text-rose-500 mb-1 uppercase">Meaning</p>
-                                            <p className="text-xl font-bold italic text-slate-700">"{bridge === 'en' ? spatialDetails[selected.id].en : spatialDetails[selected.id].hi}"</p>
-                                        </div>
-                                        <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100">
-                                            <p className="text-xs font-black text-rose-500 mb-1 uppercase">Example</p>
-                                            <p className="text-xl font-black italic text-rose-900 leading-snug">"{spatialDetails[selected.id].ex}"</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {selected.type === 'particle' && (
-                                    <div className="space-y-8">
-                                        <div className="text-8xl font-black italic text-rose-500 tracking-tighter">{selected.data.p}</div>
-                                        <div className="p-8 bg-slate-50 rounded-2xl border border-slate-100 italic font-bold text-lg text-slate-600">
-                                            {bridge === 'en' ? selected.data.en : selected.data.hi} — {selected.data.logic}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {selected.type === 'verb' && (
-                                    <div className="space-y-8">
-                                        <h4 className="text-7xl font-black text-rose-500 italic leading-none">{selected.data.dict}</h4>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="p-8 bg-slate-950 text-white rounded-3xl shadow-xl"><p className="text-[9px] font-black text-rose-400 mb-1 uppercase">Polite</p><p className="text-2xl font-black italic">{selected.data.polite}</p></div>
-                                            <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100"><p className="text-[9px] font-black text-rose-500 mb-1 uppercase">Meaning</p><p className="text-2xl font-black italic text-rose-900">{bridge === 'en' ? selected.data.en : selected.data.hi}</p></div>
-                                        </div>
-                                        <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic font-black text-2xl text-slate-800">"{selected.data.ex}"</div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* MOBILE NAV BOTTOM */}
-                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-950 px-10 py-5 rounded-full shadow-2xl flex gap-12 lg:hidden z-50 border border-white/10">
-                        <MobileBtn active={activeTab === 'particles'} icon="layers" onClick={() => setActiveTab('particles')} />
-                        <MobileBtn active={activeTab === 'kosoado'} icon="map" onClick={() => setActiveTab('kosoado')} />
-                        <MobileBtn active={activeTab === 'numbers'} icon="tag" onClick={() => setActiveTab('numbers')} />
-                        <MobileBtn active={activeTab === 'verbs'} icon="bolt" onClick={() => setActiveTab('verbs')} />
-                    </nav>
-
-                </div>
-            );
-        };
-
-        // --- COMPONENTS ---
-        const Card = ({ item, bridge, onClick }) => (
-            <button onClick={onClick} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left flex flex-col justify-between h-56 relative overflow-hidden">
-                <div className="absolute -right-4 -top-4 text-slate-50 group-hover:text-rose-50 transition-colors pointer-events-none font-black text-9xl italic uppercase leading-none">{item.p}</div>
-                <div className="relative z-10">
-                    <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">{item.label}</p>
-                    <h3 className="text-5xl font-black text-slate-900 italic group-hover:text-rose-600 transition-colors uppercase tracking-tighter leading-none">{item.p}</h3>
-                </div>
-                <p className="text-slate-500 font-extrabold text-sm relative z-10">{bridge === 'en' ? item.en : item.hi}</p>
-            </button>
-        );
-
-        const SectionHeader = ({ title, sub }) => (
-            <div className="mb-12 text-center lg:text-left">
-                <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">{title}</h2>
-                <p className="text-slate-400 font-black text-[11px] lg:text-xs uppercase tracking-[0.4em] mt-4">{sub}</p>
-            </div>
-        );
-
-        const SidebarBtn = ({ active, icon, onClick }) => (
-            <button onClick={onClick} className={`p-4 rounded-2xl transition-all duration-300 ${active ? 'bg-rose-500 text-white shadow-xl shadow-rose-500/30' : 'text-slate-500 hover:text-slate-300'}`}>
-                <span className="material-icons text-3xl">{icon}</span>
-            </button>
-        );
-
-        const MobileBtn = ({ active, icon, onClick }) => (
-            <button onClick={onClick} className={`transition-all duration-300 ${active ? 'text-rose-500 scale-125' : 'text-slate-500'}`}>
-                <span className="material-icons text-2xl">{icon}</span>
-            </button>
-        );
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+                        <div className="w-12 h-12 bg-rose-50
