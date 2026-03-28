@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongono Sensei | Master Dashboard</title>
+    <title>Nihongono Sensei | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; margin: 0; padding: 0; }
         .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(14px); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .animate-zoom { animation: zoomIn 0.3s ease-out; }
+        .animate-zoom { animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes zoom { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
     <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
         const { useState } = React;
@@ -30,58 +29,55 @@
             const [bridge, setBridge] = useState('en');
             const [selected, setSelected] = useState(null);
 
-            // --- DATA ---
+            // --- DEEP DATA ENGINE ---
             const particles = [
-                { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...', logic: 'Sets the main topic of your sentence.' },
-                { p: 'ga', label: 'Subject', en: 'The actor.', hi: 'Karta (ne)', logic: 'Pinpoints the specific subject.' },
-                { p: 'o', label: 'Object', en: 'The target.', hi: 'Karma (ko)', logic: 'The thing being acted upon.' },
-                { p: 'ni', label: 'Target/Time', en: 'At / To', hi: 'Sthan/Samay', logic: 'Destination or specific time.' },
-                { p: 'de', label: 'Location', en: 'Action place', hi: 'Kriya sthan', logic: 'Where the action happens.' },
-                { p: 'no', label: 'Possession', en: "X's Y", hi: 'Ka/Ke/Ki', logic: 'Connects two nouns.' }
-            ];
-
-            const kosoado = [
-                { id: 'item', title: "Things", row: ["kore", "sore", "are", "dore"] },
-                { id: 'place', title: "Places", row: ["koko", "soko", "asoko", "doko"] },
-                { id: 'adj', title: "Adjectives", row: ["kono", "sono", "ano", "dono"] },
-                { id: 'dir', title: "Direction", row: ["kochira", "sochira", "achira", "dochira"] }
+                { p: 'wa', label: 'Topic', en: 'As for X...', hi: 'X ke baare mein...', logic: 'Sets the main stage. Think of it as "Speaking of X...".', ex: 'Watashi wa Himanshu desu.' },
+                { p: 'ga', label: 'Subject', en: 'The Actor', hi: 'Karta (ne)', logic: 'Pinpoints the exact person doing the action. Used for emphasis.', ex: 'Dare ga ikimasu ka? Watashi ga ikimasu.' },
+                { p: 'o', label: 'Object', en: 'The Target', hi: 'Karma (ko)', logic: 'The thing receiving the action. Use with verbs like eat, drink, read.', ex: 'Kohii o nomimasu.' },
+                { p: 'ni', label: 'Target/Time', en: 'At / To', hi: 'Sthan/Samay', logic: 'Specific time (7:00) or destination (Japan).', ex: 'Nihon ni ikimasu.' },
+                { p: 'de', label: 'Context', en: 'At (Action)', hi: 'Kriya Sthan', logic: 'Where the action happens. Not just being there, but DOING something there.', ex: 'Gakkou de benkyou shimasu.' },
+                { p: 'no', label: 'Linker', en: "Possession", hi: 'Ka/Ke/Ki', logic: 'Connects two nouns. The first noun owns or describes the second.', ex: 'Watashi no tomodachi.' }
             ];
 
             const spatialDetails = {
-                kore: { en: "This (near me)", hi: "Yeh (paas)", ex: "Kore wa hon desu.", logic: "For items you touch." },
-                sore: { en: "That (near you)", hi: "Woh (aapke paas)", ex: "Sore wa nan desu ka?", logic: "For items near listener." },
-                are: { en: "That far away", hi: "Woh door wala", ex: "Are wa yama desu.", logic: "Far from both people." },
-                dore: { en: "Which one?", hi: "Kaunsa?", ex: "Dore desu ka?", logic: "Questioning objects." },
-                koko: { en: "Here", hi: "Yahan", ex: "Koko desu.", logic: "This spot right here." },
-                soko: { en: "There", hi: "Wahan", ex: "Soko ni.", logic: "Spot near the listener." },
-                asoko: { en: "Over there", hi: "Door wahan", ex: "Asoko desu.", logic: "A distant spot." },
-                doko: { en: "Where?", hi: "Kahan?", ex: "Doko desu ka?", logic: "Asking location." },
-                kono: { en: "This [Noun]", hi: "Yeh [Noun]", ex: "Kono hon.", logic: "Must follow with a noun." },
-                sono: { en: "That [Noun]", hi: "Woh [Noun]", ex: "Sono pen.", logic: "Noun near the listener." },
-                ano: { en: "That far [Noun]", hi: "Woh door [Noun]", ex: "Ano hito.", logic: "Noun far from everyone." },
-                dono: { en: "Which [Noun]?", hi: "Kaunsa [Noun]?", ex: "Dono kutsu?", logic: "Asking 'Which [X]?'" },
-                kochira: { en: "This way", hi: "Is taraf", ex: "Kochira e.", logic: "Polite direction/person near me." },
-                sochira: { en: "That way", hi: "Us taraf", ex: "Sochira e.", logic: "Direction near listener." },
-                achira: { en: "Far way", hi: "Door taraf", ex: "Achira e.", logic: "Distant direction." },
-                dochira: { en: "Which way?", hi: "Kis taraf?", ex: "Dochira?", logic: "Asking direction (polite)." }
+                kore: { 
+                    en: "This (near me)", hi: "Yeh (paas)", 
+                    logic: "Used for things you are currently holding or within your arm's reach.",
+                    ex: "Kore wa oishii desu. (This is delicious.)" 
+                },
+                sore: { 
+                    en: "That (near you)", hi: "Woh (aapke paas)", 
+                    logic: "Used for things near the person you are talking to.",
+                    ex: "Sore wa nan desu ka? (What is that near you?)" 
+                },
+                are: { 
+                    en: "That (far away)", hi: "Woh (door)", 
+                    logic: "Used for things far away from both people. Up a mountain, in the sky, etc.",
+                    ex: "Are wa Fujisan desu. (That far away is Mt. Fuji.)" 
+                },
+                dore: { 
+                    en: "Which one?", hi: "Kaunsa?", 
+                    logic: "Used to ask which specific item among three or more.",
+                    ex: "Anata no kagi wa dore desu ka? (Which one is your key?)" 
+                },
+                koko: { en: "Here", hi: "Yahan", logic: "The place you are currently standing.", ex: "Koko wa Anand desu." },
+                soko: { en: "There", hi: "Wahan", logic: "The place the listener is standing.", ex: "Soko ni suwatte!" },
+                asoko: { en: "Over there", hi: "Wahan door", logic: "A distant place from both people.", ex: "Asoko ni konbini ga arimasu." },
+                doko: { en: "Where?", hi: "Kahan?", logic: "Asking for a location.", ex: "Toire wa doko desu ka?" }
             };
+
+            const verbs = [
+                { dict: 'Iku', polite: 'Ikimasu', group: 'G1', en: 'Go', hi: 'Jaana', logic: 'Movement away from where you are now.', ex: 'Kaisha ni ikimasu.' },
+                { dict: 'Nomu', polite: 'Nomimasu', group: 'G1', en: 'Drink', hi: 'Peena', logic: 'Consuming liquids. Use with particle "o".', ex: 'Mizu o nomimasu.' },
+                { dict: 'Taberu', polite: 'Tabemasu', group: 'G2', en: 'Eat', hi: 'Khana', logic: 'Standard word for eating meals.', ex: 'Ranchi o tabemasu.' },
+                { dict: 'Miru', polite: 'Mimasu', group: 'G2', en: 'Watch', hi: 'Dekhna', logic: 'Watching TV, movies, or just seeing someone.', ex: 'Eiga o mimasu.' },
+                { dict: 'Suru', polite: 'Shimasu', group: 'G3', en: 'Do', hi: 'Karna', logic: 'Turns nouns into actions (e.g. Study + Do = To Study).', ex: 'Benkyou o shimasu.' }
+            ];
 
             const counters = [
                 { title: 'General (-tsu)', items: ['hitotsu', 'futatsu', 'mittsu', 'yottsu', 'itsutsu', 'muttsu', 'nanatsu', 'yattsu', 'kokonotsu', 'tooo'] },
                 { title: 'People (-nin)', items: ['hitori ★', 'futari ★', 'san-nin', 'yo-nin ★', 'go-nin', 'roku-nin', 'shichi-nin'] },
-                { title: 'Time (-ji)', items: ['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji'] },
-                { title: 'Small Items (-ko)', items: ['ikko', 'niko', 'sanko', 'yonko', 'goko', 'rokko'] },
-                { title: 'Flat Objects (-mai)', items: ['ichimai', 'nimai', 'sanmai', 'yonmai', 'gomai'] },
-                { title: 'Animals (-piki)', items: ['ippiki ★', 'nihiki', 'sanbiki ★', 'yonhiki', 'gohiki'] }
-            ];
-
-            const verbs = [
-                { dict: 'Iku', polite: 'Ikimasu', group: 'G1', en: 'Go', hi: 'Jaana', ex: 'Gakkou ni ikimasu.' },
-                { dict: 'Nomu', polite: 'Nomimasu', group: 'G1', en: 'Drink', hi: 'Peena', ex: 'Mizu o nomimasu.' },
-                { dict: 'Taberu', polite: 'Tabemasu', group: 'G2', en: 'Eat', hi: 'Khana', ex: 'Ranchi o tabemasu.' },
-                { dict: 'Miru', polite: 'Mimasu', group: 'G2', en: 'See', hi: 'Dekhna', ex: 'Terebi o mimasu.' },
-                { dict: 'Suru', polite: 'Shimasu', group: 'G3', en: 'Do', hi: 'Karna', ex: 'Benkyou o shimasu.' },
-                { dict: 'Kuru', polite: 'Kimasu', group: 'G3', en: 'Come', hi: 'Aana', ex: 'Tomodachi ga kimasu.' }
+                { title: 'Time (-ji)', items: ['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji'] }
             ];
 
             return (
@@ -89,4 +85,182 @@
                     
                     {/* SIDEBAR */}
                     <aside className="hidden lg:flex w-24 bg-slate-950 flex-col items-center py-10 gap-10 fixed h-full z-50 shadow-2xl">
-                        <div className="w-12 h-12 bg-rose-50
+                        <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg text-xl">N</div>
+                        <nav className="flex flex-col gap-8">
+                            <SidebarBtn active={activeTab === 'particles'} icon="layers" onClick={() => setActiveTab('particles')} />
+                            <SidebarBtn active={activeTab === 'kosoado'} icon="map" onClick={() => setActiveTab('kosoado')} />
+                            <SidebarBtn active={activeTab === 'numbers'} icon="tag" onClick={() => setActiveTab('numbers')} />
+                            <SidebarBtn active={activeTab === 'verbs'} icon="bolt" onClick={() => setActiveTab('verbs')} />
+                        </nav>
+                    </aside>
+
+                    {/* MAIN */}
+                    <main className="flex-1 lg:ml-24 pb-24 lg:pb-10">
+                        <header className="sticky top-0 z-40 glass border-b border-slate-100 px-6 lg:px-12 py-6 flex justify-between items-center">
+                            <div>
+                                <h1 className="text-xl lg:text-2xl font-extrabold tracking-tighter text-slate-900 italic uppercase">Nihongono <span className="text-rose-500 font-black">Sensei</span></h1>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Created by Japa & Himanshu</p>
+                            </div>
+                            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+                                <button onClick={() => setBridge('en')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'en' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}>ENGLISH</button>
+                                <button onClick={() => setBridge('hi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${bridge === 'hi' ? 'bg-white shadow-md text-rose-500' : 'text-slate-400'}`}>HINDI</button>
+                            </div>
+                        </header>
+
+                        <div className="max-w-7xl mx-auto p-6 lg:p-12">
+                            {activeTab === 'particles' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-zoom">
+                                    {particles.map((item, i) => (
+                                        <button key={i} onClick={() => setSelected({type: 'particle', data: item})} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left flex flex-col justify-between h-56 group overflow-hidden relative">
+                                            <div className="absolute top-0 right-0 p-10 text-slate-50 font-black text-8xl italic group-hover:text-rose-50 transition-colors uppercase leading-none">{item.p}</div>
+                                            <div className="relative z-10">
+                                                <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest">{item.label}</p>
+                                                <h3 className="text-4xl font-black text-slate-900 italic uppercase mt-1 tracking-tighter group-hover:text-rose-600 transition-colors">{item.p}</h3>
+                                            </div>
+                                            <p className="text-slate-500 font-extrabold text-sm relative z-10">{bridge === 'en' ? item.en : item.hi}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {activeTab === 'kosoado' && (
+                                <div className="animate-zoom">
+                                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-slate-950 text-white text-[10px] uppercase font-black">
+                                                <tr>
+                                                    <th className="p-8">Category</th>
+                                                    <th className="p-8 text-rose-400">KO (Near)</th>
+                                                    <th className="p-8 text-blue-400">SO (Mid)</th>
+                                                    <th className="p-8 text-emerald-400">A (Far)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                {['kore','koko'].map((rowStart, idx) => (
+                                                    <tr key={idx}>
+                                                        <td className="p-8 bg-slate-50 font-black text-[10px] text-slate-400 uppercase tracking-widest">{rowStart === 'kore' ? 'Objects' : 'Places'}</td>
+                                                        {[0,1,2].map(j => {
+                                                            const keys = rowStart === 'kore' ? ['kore','sore','are'] : ['koko','soko','asoko'];
+                                                            const word = keys[j];
+                                                            return (
+                                                                <td key={j} className="p-4">
+                                                                    <button onClick={() => setSelected({type: 'spatial', id: word})} className="w-full py-8 rounded-2xl hover:bg-rose-50 hover:text-rose-600 font-black text-xl italic transition-all uppercase">{word}</button>
+                                                                </td>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'numbers' && (
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-zoom">
+                                    {counters.map((group, i) => (
+                                        <div key={i} className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm">
+                                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">{group.title}</h3>
+                                            <div className="flex flex-wrap gap-2">
+                                                {group.items.map((it, j) => (
+                                                    <span key={j} className={`px-4 py-2 rounded-xl text-xs font-bold border italic ${it.includes('★') ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-slate-50 text-slate-600 border-slate-100'}`}>{it}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {activeTab === 'verbs' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-zoom">
+                                    {verbs.map((v, i) => (
+                                        <button key={i} onClick={() => setSelected({type: 'verb', data: v})} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left">
+                                            <span className="text-[9px] font-black text-rose-500 bg-rose-50 px-3 py-1 rounded-full uppercase tracking-widest">{v.group}</span>
+                                            <h3 className="text-4xl font-black text-slate-900 italic tracking-tighter mt-4">{v.dict}</h3>
+                                            <p className="text-slate-400 font-extrabold text-sm uppercase mt-1">{bridge === 'en' ? v.en : v.hi}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </main>
+
+                    {/* MODAL SYSTEM */}
+                    {selected && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
+                            <div className="relative bg-white w-full max-w-xl rounded-[3.5rem] p-10 lg:p-14 shadow-2xl animate-zoom">
+                                <button onClick={() => setSelected(null)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-900 transition-colors"><span className="material-icons text-3xl">close</span></button>
+                                
+                                {selected.type === 'particle' && (
+                                    <div className="space-y-8">
+                                        <div className="text-8xl font-black italic text-rose-500 leading-none">{selected.data.p}</div>
+                                        <div className="space-y-6">
+                                            <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 shadow-inner">
+                                                <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">Sensei Logic</p>
+                                                <p className="text-xl font-bold text-slate-700 italic leading-snug">"{selected.data.logic}"</p>
+                                            </div>
+                                            <div className="p-8 bg-rose-50 rounded-[2.5rem] border border-rose-100">
+                                                <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">Real Example</p>
+                                                <p className="text-2xl font-black text-rose-900 italic tracking-tight">"{selected.data.ex}"</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {selected.type === 'spatial' && (
+                                    <div className="space-y-8">
+                                        <div className="text-7xl font-black italic text-rose-500 leading-none">{selected.id}</div>
+                                        <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                                            <p className="text-xs font-black text-rose-500 mb-1 uppercase tracking-widest">Logic Breakdown</p>
+                                            <p className="text-lg font-bold italic text-slate-700">"{spatialDetails[selected.id].logic}"</p>
+                                        </div>
+                                        <div className="p-8 bg-rose-950 text-white rounded-3xl shadow-xl">
+                                            <p className="text-xs font-black text-rose-400 mb-2 uppercase tracking-widest">Usage</p>
+                                            <p className="text-2xl font-black italic tracking-wide">"{spatialDetails[selected.id].ex}"</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {selected.type === 'verb' && (
+                                    <div className="space-y-10">
+                                        <h4 className="text-7xl font-black text-rose-500 italic tracking-tighter leading-none">{selected.data.dict}</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="p-8 bg-slate-950 text-white rounded-3xl shadow-xl"><p className="text-[9px] font-black text-rose-400 mb-1 uppercase tracking-widest">Polite Form</p><p className="text-2xl font-black italic">{selected.data.polite}</p></div>
+                                            <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100"><p className="text-[9px] font-black text-rose-500 mb-1 uppercase tracking-widest">Logic</p><p className="text-lg font-bold italic text-rose-900">{selected.data.logic}</p></div>
+                                        </div>
+                                        <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic font-black text-2xl text-slate-800 leading-tight">"{selected.data.ex}"</div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MOBILE NAV BOTTOM */}
+                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-950 px-10 py-5 rounded-full shadow-2xl flex gap-12 lg:hidden z-50 border border-white/10">
+                        <MobileBtn active={activeTab === 'particles'} icon="layers" onClick={() => setActiveTab('particles')} />
+                        <MobileBtn active={activeTab === 'kosoado'} icon="map" onClick={() => setActiveTab('kosoado')} />
+                        <MobileBtn active={activeTab === 'numbers'} icon="tag" onClick={() => setActiveTab('numbers')} />
+                        <MobileBtn active={activeTab === 'verbs'} icon="bolt" onClick={() => setActiveTab('verbs')} />
+                    </nav>
+
+                </div>
+            );
+        };
+
+        const SidebarBtn = ({ active, icon, onClick }) => (
+            <button onClick={onClick} className={`p-4 rounded-2xl transition-all duration-300 ${active ? 'bg-rose-500 text-white shadow-xl shadow-rose-500/30' : 'text-slate-500 hover:text-slate-300'}`}>
+                <span className="material-icons text-3xl">{icon}</span>
+            </button>
+        );
+
+        const MobileBtn = ({ active, icon, onClick }) => (
+            <button onClick={onClick} className={`transition-all duration-300 ${active ? 'text-rose-500 scale-125' : 'text-slate-500'}`}>
+                <span className="material-icons text-2xl">{icon}</span>
+            </button>
+        );
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
