@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongono Sensei | Ultimate Master Lab</title>
+    <title>Nihongono Sensei | Ultimate Master Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -44,54 +44,66 @@
 
             const pEx = (text) => {
                 if (!userName) return text;
-                return text.replace(/Himanshu|User|Japa/g, userName);
+                return text.replace(/Himanshu|User|Student|Japa/g, userName);
             };
 
-            // --- PROFESSIONAL DATA ENGINE ---
+            // --- TEACHER DATA ENGINE (CONSOLIDATED) ---
             const particleGroups = [
                 { title: "Essential Basics", items: [
-                    { p:'WA', label_en:'Topic Marker', label_hi:'Vishay Marker', logic_en:'Sets the overall context.', logic_hi:'Sentence kis baare mein hai yeh batata hai.', cases: [
-                        { label:'ID', ex_en:'Watashi wa Himanshu desu. (I am Himanshu)', ex_hi:'Watashi wa Himanshu desu. (Main Himanshu hoon)' },
-                        { label:'Fact', ex_en:'Kyoun wa samui desu. (Today is cold)', ex_hi:'Kyou wa samui desu. (Aaj thand hai)' }
+                    { p:'WA', label_en:'Topic Marker', label_hi:'Vishay Marker', logic_en:'Defines what the sentence is about.', logic_hi:'Sentence kis baare mein hai yeh batata hai.', cases: [
+                        { label:'Identity', ex_en:'Watashi wa Himanshu desu. (I am Himanshu)', ex_hi:'Watashi wa Himanshu desu. (Main Himanshu hoon)' },
+                        { label:'Description', ex_en:'Kyoun wa samui desu. (Today is cold)', ex_hi:'Kyou wa samui desu. (Aaj thand hai)' }
                     ]},
-                    { p:'GA', label_en:'Subject Marker', label_hi:'Karta Marker', logic_en:'Focuses on the specific actor.', logic_hi:'Karta (actor) par zor deta hai.', cases: [
+                    { p:'GA', label_en:'Subject Marker', label_hi:'Karta Marker', logic_en:'Identifies a specific person or object.', logic_hi:'Karta (actor) ko identify karta hai.', cases: [
                         { label:'Identify', ex_en:'Himanshu ga ikimasu. (Himanshu is the one going)', ex_hi:'Himanshu ga ikimasu. (Himanshu hi jaayega)' },
-                        { label:'Exist', ex_en:'Inu ga imasu. (There is a dog)', ex_hi:'Inu ga imasu. (Kutta hai)' }
+                        { label:'Existence', ex_en:'Neko ga imasu. (There is a cat)', ex_hi:'Neko ga imasu. (Billi hai)' }
                     ]},
                     { p:'O', label_en:'Object Marker', label_hi:'Karma Marker', logic_en:'Marks the target of the action.', logic_hi:'Jis cheez par kaam ho raha hai use mark karta hai.', cases: [
                         { label:'Action', ex_en:'Kohii o nomimasu. (Drink coffee)', ex_hi:'Kohii o nomimasu. (Coffee peena)' },
                         { label:'Read', ex_en:'Hon o yomimasu. (Read book)', ex_hi:'Hon o yomimasu. (Kitaab padhna)' }
                     ]}
                 ]},
-                { title: "Movement & Time", items: [
+                { title: "Movement & Connectors", items: [
                     { p:'NI', label_en:'Target/Time', label_hi:'Manzil/Samay', logic_en:'Specific goal point or time.', logic_hi:'Manzil ya pakka samay batata hai.', cases: [
-                        { label:'Goal', ex_en:'Kaisha ni ikimasu. (Go to office)', ex_hi:'Kaisha ni ikimasu. (Office jaana)' },
+                        { label:'Goal', ex_en:'Nihon ni ikimasu. (Going to Japan)', ex_hi:'Nihon ni ikimasu. (Japan jaana)' },
                         { label:'Time', ex_en:'Hachi-ji ni okimasu. (Wake at 8)', ex_hi:'Hachi-ji ni okimasu. (8 baje uthna)' }
                     ]},
                     { p:'E', label_en:'Direction', label_hi:'Disha', logic_en:'Focuses on the journey direction.', logic_hi:'Yatra ki disha (direction) par zor deta hai.', cases: [
-                        { label:'Travel', ex_en:'Uchi e kaerimasu. (Heading home)', ex_hi:'Uchi e kaerimasu. (Ghar ki taraf jaana)' }
+                        { label:'Heading', ex_en:'Uchi e kaerimasu. (Heading home)', ex_hi:'Uchi e kaerimasu. (Ghar ki taraf jaana)' }
                     ]},
                     { p:'KARA', label_en:'Start Point', label_hi:'Shuruat Point', logic_en:'Starting point (From).', logic_hi:'Shuruat ka point (Se) batata hai.', cases: [
                         { label:'Origin', ex_en:'Indo kara kita. (Came from India)', ex_hi:'Indo kara kita. (India se aaya)' }
                     ]},
                     { p:'MADE', label_en:'End Point', label_hi:'Ant Point', logic_en:'Ending point (Until).', logic_hi:'Ant ka point (Tak) batata hai.', cases: [
                         { label:'Limit', ex_en:'Go-ji made hataraku. (Work until 5)', ex_hi:'Go-ji made hataraku. (5 baje tak kaam)' }
+                    ]},
+                    { p:'NO', label_en:'Linker', label_hi:'Malkiyat', logic_en:'Shows possession or relationship.', logic_hi:'Sambandh ya malkiyat (Ka/Ke/Ki) batata hai.', cases: [
+                        { label:'Possess', ex_en:'Watashi no pen. (My pen)', ex_hi:'Watashi no pen. (Mera pen)' }
+                    ]},
+                    { p:'MO', label_en:'Inclusion', label_hi:'Inclusion', logic_en:'Means "Too" or "Also".', logic_hi:'Iska matlab hai "Bhi".', cases: [
+                        { label:'Also', ex_en:'Watashi mo iku. (I also go)', ex_hi:'Watashi mo iku. (Main bhi jaata hoon)' }
+                    ]},
+                    { p:'TO', label_en:'With/And', label_hi:'Saath', logic_en:'Used for companion or lists.', logic_hi:'Saath ya list ke liye.', cases: [
+                        { label:'With', ex_en:'Himanshu to hanasu. (Talk with Himanshu)', ex_hi:'Himanshu to hanasu. (Himanshu ke saath baat)' }
+                    ]},
+                    { p:'SOSHITE', label_en:'Sequence', label_hi:'Sequence', logic_en:'Sentence starter for "And then".', logic_hi:'Sentences ko "Aur phir" ki tarah jodta hai.', cases: [
+                        { label:'Then', ex_en:'Tabemasu. Soshite nemasu. (Eat. Then sleep)', ex_hi:'Khana. Soshite sona.' }
                     ]}
                 ]}
             ];
 
             const multitaskers = [
                 { p: 'NI vs DE', title: 'State vs Action', logic_en:'NI for static existence. DE for activity.', logic_hi:'NI bas hone ke liye. DE kaam karne ke liye.', compare: [
-                    { side:'NI', desc_en:'Static (Existing)', desc_hi:'Bas hona', cases: [{label:'Ex', ex_en:'Uchi ni imasu. (I am at home)', ex_hi:'Uchi ni imasu. (Main ghar par hoon)'}] },
-                    { side:'DE', desc_en:'Active (Action)', desc_hi:'Kaam karna', cases: [{label:'Ex', ex_en:'Uchi de tabemasu. (I eat at home)', ex_hi:'Uchi de tabemasu. (Main ghar par khata hoon)'}] }
+                    { side:'NI', desc_en:'Static Existence', desc_hi:'Bas hona', cases: [{label:'Ex', ex_en:'Uchi ni imasu. (I am at home)', ex_hi:'Uchi ni imasu. (Main ghar par hoon)'}] },
+                    { side:'DE', desc_en:'Active Action', desc_hi:'Kaam karna', cases: [{label:'Ex', ex_en:'Uchi de tabemasu. (I eat at home)', ex_hi:'Uchi de tabemasu. (Main ghar par khata hoon)'}] }
                 ]},
-                { p: 'NI vs E', title: 'Goal vs Path', logic_en:'NI is the arrival point. E is the path focus.', logic_hi:'NI manzil ka point hai. E raste ki disha hai.', compare: [
-                    { side:'NI', desc_en:'Arrival Goal', desc_hi:'Manzil focus', cases: [{label:'Ex', ex_en:'Tokyo ni taita. (Arrived in Tokyo)', ex_hi:'Tokyo ni taita. (Tokyo pahunch gaya)'}] },
-                    { side:'E', desc_en:'Travel Direction', desc_hi:'Disha focus', cases: [{label:'Ex', ex_en:'Tokyo e mukau. (Facing Tokyo)', ex_hi:'Tokyo e mukau. (Tokyo ki taraf)'}] }
+                { p: 'NI vs E', title: 'Goal vs Heading', logic_en:'NI is arrival goal. E is direction focus.', logic_hi:'NI manzil ka point hai. E raste ki disha hai.', compare: [
+                    { side:'NI', desc_en:'Arrival', desc_hi:'Manzil focus', cases: [{label:'Ex', ex_en:'Tokyo ni taita. (Arrived in Tokyo)', ex_hi:'Tokyo ni taita. (Tokyo pahunch gaya)'}] },
+                    { side:'E', desc_en:'Path', desc_hi:'Disha focus', cases: [{label:'Ex', ex_en:'Tokyo e mukau. (Facing Tokyo)', ex_hi:'Tokyo e mukau. (Tokyo ki taraf)'}] }
                 ]},
-                { p: 'E vs DE', title: 'Path vs Place', logic_en:'E is where you head. DE is where you do.', logic_hi:'E disha ke liye. DE kaam ki jagah ke liye.', compare: [
-                    { side:'E', desc_en:'Directional', desc_hi:'Taraf jaana', cases: [{label:'Ex', ex_en:'Kaisha e iku. (Heading to office)', ex_hi:'Kaisha e iku. (Office ki taraf jaana)'}] },
-                    { side:'DE', desc_en:'Task Location', desc_hi:'Kaam ki jagah', cases: [{label:'Ex', ex_en:'Kaisha de hataraku. (Work at office)', ex_hi:'Kaisha de hataraku. (Office mein kaam karna)'}] }
+                { p: 'E vs DE', title: 'Path vs Place', logic_en:'E is journey path. DE is activity place.', logic_hi:'E yatra ki disha. DE kaam ki jagah.', compare: [
+                    { side:'E', desc_en:'Heading', desc_hi:'Taraf jaana', cases: [{label:'Ex', ex_en:'Gakkou e iku. (Heading to school)', ex_hi:'Gakkou e iku. (School ki taraf jaana)'}] },
+                    { side:'DE', desc_en:'Location', desc_hi:'Activity ki jagah', cases: [{label:'Ex', ex_en:'Gakkou de benkyou. (Study at school)', ex_hi:'Gakkou de benkyou. (School mein padhna)'}] }
                 ]}
             ];
 
@@ -106,7 +118,9 @@
             };
 
             const basicNumbers = [
-                { n: '1-10', r: 'ichi..juu' }, { n: '100', r: 'hyaku' }, { n: '1,000', r: 'sen' }, { n: '10,000', r: 'man' }
+                { n: '1', r: 'ichi' }, { n: '2', r: 'ni' }, { n: '3', r: 'san' }, { n: '4', r: 'yon' }, { n: '5', r: 'go' },
+                { n: '6', r: 'roku' }, { n: '7', r: 'nana' }, { n: '8', r: 'hachi' }, { n: '9', r: 'kyuu' }, { n: '10', r: 'juu' },
+                { n: '100', r: 'hyaku' }, { n: '1,000', r: 'sen' }, { n: '10,000', r: 'man' }
             ];
 
             const calendarData = {
@@ -116,16 +130,22 @@
                     { m: 'Sep', r: 'Ku-gatsu ★' }, { m: 'Oct', r: 'Juu-gatsu' }, { m: 'Nov', r: 'Juuichi-gatsu' }, { m: 'Dec', r: 'Juuni-gatsu' }
                 ],
                 weekdays: [
-                    { d: 'Mon', r: 'Getsu-youbi', en: 'Moon', hi: 'Chandra' }, { d: 'Tue', r: 'Ka-youbi', en: 'Fire', hi: 'Agni' },
-                    { d: 'Wed', r: 'Sui-youbi', en: 'Water', hi: 'Jal' }, { d: 'Thu', r: 'Moku-youbi', en: 'Wood', hi: 'Lakdi' },
-                    { d: 'Fri', r: 'Kin-youbi', en: 'Gold', hi: 'Sona' }, { d: 'Sat', r: 'Do-youbi', en: 'Earth', hi: 'Prithvi' },
-                    { d: 'Sun', r: 'Nichi-youbi', en: 'Sun', hi: 'Surya' }
+                    { d: 'Mon', r: 'Getsu-youbi', hi: 'Chandra-vaar' }, { d: 'Tue', r: 'Ka-youbi', hi: 'Agni-vaar' },
+                    { d: 'Wed', r: 'Sui-youbi', hi: 'Jal-vaar' }, { d: 'Thu', r: 'Moku-youbi', hi: 'Lakdi-vaar' },
+                    { d: 'Fri', r: 'Kin-youbi', hi: 'Sona-vaar' }, { d: 'Sat', r: 'Do-youbi', hi: 'Matti-vaar' },
+                    { d: 'Sun', r: 'Nichi-youbi', hi: 'Surya-vaar' }
                 ]
             };
 
             const counterCards = [
                 { title: 'General (-tsu)', logic_en: 'Universal objects.', logic_hi: 'Standalone cheezon ke liye.', items: ['hitotsu', 'futatsu', 'mittsu'], ex_en: 'Mittsu no ringo. (3 apples)', ex_hi: 'Mittsu no ringo. (3 sev)' },
-                { title: 'People (-nin)', logic_en: 'Counting humans.', logic_hi: 'Insaano ko ginne ke liye.', items: ['hitori ★', 'futari ★', 'san-nin'], ex_en: 'Sannin no tomodachi. (3 friends)', ex_hi: 'Sannin no tomodachi. (3 dost)' }
+                { title: 'People (-nin)', logic_en: 'Counting humans.', logic_hi: 'Insaano ko ginne ke liye.', items: ['hitori ★', 'futari ★', 'san-nin'], ex_en: 'Sannin no gakusei. (3 students)', ex_hi: 'Sannin no gakusei. (3 vidyarthi)' }
+            ];
+
+            const verbGroups = [
+                { title: 'Group 1', rule: 'u → i + masu', verbs: [{dict:'Iku', polite:'Ikimasu', ex:'Kaisha ni iku.'}, {dict:'Nomu', polite:'Nomimasu', ex:'Mizu o nomu.'}] },
+                { title: 'Group 2', rule: 'drop ru + masu', verbs: [{dict:'Taberu', polite:'Tabemasu', ex:'Ranchi o taberu.'}] },
+                { title: 'Group 3', rule: 'Fixed', verbs: [{dict:'Suru', polite:'Shimasu', ex:'Benkyou o suru.'}] }
             ];
 
             if (!userName) {
@@ -133,7 +153,7 @@
                     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-center">
                         <div className="max-w-md w-full bg-white rounded-[3.5rem] p-12 shadow-2xl animate-zoom">
                             <div className="w-20 h-20 bg-teal-500 rounded-3xl flex items-center justify-center text-white mx-auto mb-8 shadow-xl shadow-teal-500/20"><span className="material-icons text-4xl">face</span></div>
-                            <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter">Konnichiwa!</h2>
+                            <h2 className="text-3xl font-black text-slate-900 uppercase italic">Konnichiwa!</h2>
                             <p className="text-slate-400 font-bold text-[11px] uppercase tracking-widest mt-4 mb-10">Sensei is ready for you</p>
                             <form onSubmit={handleNameSubmit} className="space-y-4">
                                 <input type="text" placeholder="Enter Name..." className="w-full bg-slate-100 py-5 px-8 rounded-2xl text-lg font-bold outline-none text-center focus:ring-4 focus:ring-teal-500/10" value={tempName} onChange={(e) => setTempName(e.target.value)} autoFocus />
@@ -146,17 +166,20 @@
 
             return (
                 <div className="min-h-screen flex flex-col lg:flex-row">
+                    {/* SIDEBAR */}
                     <aside className="hidden lg:flex w-32 bg-slate-950 flex-col items-center py-10 fixed h-full z-50 shadow-2xl">
                         <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg text-xl mb-12">N</div>
                         <nav className="flex flex-col gap-8 w-full px-2 text-center uppercase font-black text-[9px] tracking-widest">
                             <SidebarBtn active={activeTab === 'particles'} icon="layers" label="Particles" onClick={() => setActiveTab('particles')} />
                             <SidebarBtn active={activeTab === 'calendar'} icon="calendar_today" label="Calendar" onClick={() => setActiveTab('calendar')} />
                             <SidebarBtn active={activeTab === 'numbers'} icon="tag" label="Numbers" onClick={() => setActiveTab('numbers')} />
+                            <SidebarBtn active={activeTab === 'verbs'} icon="bolt" label="Verbs" onClick={() => setActiveTab('verbs')} />
                         </nav>
                         <button onClick={() => {localStorage.removeItem('nihongo_user'); window.location.reload();}} className="mt-auto text-slate-600 hover:text-teal-400 mb-6 transition-colors"><span className="material-icons">logout</span></button>
                     </aside>
 
                     <main className="flex-1 lg:ml-32 pb-24">
+                        {/* HEADER */}
                         <header className="sticky top-0 z-40 glass border-b border-slate-100 px-8 py-6 flex justify-between items-center">
                             <div className="flex flex-col">
                                 <h1 className="text-xl lg:text-2xl font-black tracking-tighter text-slate-900 italic uppercase leading-none">Nihongono <span className="text-teal-600 font-black">Sensei</span></h1>
@@ -169,7 +192,7 @@
                         </header>
 
                         <div className="max-w-7xl mx-auto p-6 lg:p-12 space-y-20">
-                            {/* PARTICLES */}
+                            {/* TAB: PARTICLES */}
                             {activeTab === 'particles' && (
                                 <div className="space-y-20 animate-zoom">
                                     {particleGroups.map((group, idx) => (
@@ -183,7 +206,7 @@
                                                             <p className="text-[10px] font-black text-teal-600 uppercase mb-1">{bridge === 'en' ? item.label_en : item.label_hi}</p>
                                                             <h3 className="text-4xl font-black text-slate-900 italic uppercase tracking-tighter">{item.p}</h3>
                                                         </div>
-                                                        <p className="text-slate-500 font-extrabold text-xs relative z-10">{bridge === 'en' ? 'Learn Rules' : 'Gehre Rules'}</p>
+                                                        <p className="text-slate-500 font-extrabold text-xs relative z-10">{bridge === 'en' ? 'Learn' : 'Sikhein'}</p>
                                                     </button>
                                                 ))}
                                             </div>
@@ -206,14 +229,14 @@
                                 </div>
                             )}
 
-                            {/* NUMBERS */}
+                            {/* TAB: NUMBERS */}
                             {activeTab === 'numbers' && (
                                 <div className="space-y-12 animate-zoom">
                                     <div className="bg-white rounded-[3rem] p-10 shadow-xl border border-slate-100">
                                         <h2 className="text-teal-600 font-black text-2xl uppercase italic mb-8 border-l-4 border-teal-600 pl-4 uppercase">Basic Mastery</h2>
-                                        <div className="grid grid-cols-4 gap-4">
-                                            {numberMastery.map((num, i) => (
-                                                <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center"><p className="text-3xl font-black text-slate-900">{num.n}</p><p className="text-xs font-bold text-slate-400 uppercase">{num.r}</p></div>
+                                        <div className="grid grid-cols-4 md:grid-cols-7 gap-4">
+                                            {basicNumbers.map((num, i) => (
+                                                <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center hover:bg-teal-50 transition-colors"><p className="text-3xl font-black text-slate-900">{num.n}</p><p className="text-[10px] font-bold text-slate-400 uppercase">{num.r}</p></div>
                                             ))}
                                         </div>
                                     </div>
@@ -234,7 +257,7 @@
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {counterCards.map((group, i) => (
                                             <div key={i} className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl flex flex-col justify-between h-80">
-                                                <div><h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tighter mb-2">{group.title}</h3><p className="text-slate-400 text-xs font-bold mb-6">{bridge==='en'?group.logic_en:group.logic_hi}</p><div className="flex flex-wrap gap-2">{group.items.map((it, j) => (<span key={j} className="px-4 py-2 rounded-xl text-xs font-bold border italic bg-slate-50 text-slate-600">{it}</span>))}</div></div>
+                                                <div><h3 className="text-xl font-black text-slate-900 uppercase mb-2">{group.title}</h3><p className="text-slate-400 text-xs font-bold mb-6">{bridge==='en'?group.logic_en:group.logic_hi}</p><div className="flex flex-wrap gap-2">{group.items.map((it, j) => (<span key={j} className="px-4 py-2 rounded-xl text-xs font-bold border italic bg-slate-50 text-slate-600">{it}</span>))}</div></div>
                                                 <p className="text-teal-600 font-black text-[10px] uppercase tracking-widest border-t pt-4 italic">Ex: {pEx(bridge === 'en' ? group.ex_en : group.ex_hi)}</p>
                                             </div>
                                         ))}
@@ -242,27 +265,46 @@
                                 </div>
                             )}
 
-                            {/* CALENDAR */}
+                            {/* TAB: CALENDAR */}
                             {activeTab === 'calendar' && (
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-zoom">
                                     <div className="bg-slate-900 p-10 rounded-[3rem] shadow-2xl text-white">
-                                        <h2 className="text-amber-400 font-black text-2xl uppercase italic mb-8 border-l-4 border-amber-400 pl-4">All Months</h2>
+                                        <h2 className="text-amber-400 font-black text-2xl uppercase italic mb-8 border-l-4 border-amber-400 pl-4">All 12 Months</h2>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                             {calendarData.months.map((m, i) => (<div key={i} className="bg-white/5 border border-white/10 p-4 rounded-xl font-bold flex justify-between"><span>{m.m}</span><span>{m.r}</span></div>))}
                                         </div>
                                     </div>
                                     <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl">
-                                        <h2 className="text-teal-600 font-black text-2xl uppercase italic mb-8 border-l-4 border-teal-600 pl-4">Weekdays</h2>
+                                        <h2 className="text-teal-600 font-black text-2xl uppercase italic mb-8 border-l-4 border-teal-600 pl-4">Weekdays Logic</h2>
                                         <div className="space-y-3">
-                                            {calendarData.weekdays.map((w, i) => (<div key={i} className="flex justify-between p-4 bg-slate-50 rounded-xl font-black italic uppercase"><span>{w.r}</span><span className="text-slate-300 tracking-widest text-[10px]">{bridge === 'en' ? w.en : w.hi}</span></div>))}
+                                            {calendarData.weekdays.map((w, i) => (<div key={i} className="flex justify-between p-4 bg-slate-50 rounded-xl font-black italic uppercase"><span>{w.r}</span><span className="text-slate-300 tracking-widest text-[10px]">{bridge === 'en' ? w.d : w.hi}</span></div>))}
                                         </div>
                                     </div>
+                                </div>
+                            )}
+
+                            {/* TAB: VERBS */}
+                            {activeTab === 'verbs' && (
+                                <div className="space-y-16 animate-zoom">
+                                    {verbGroups.map((group, idx) => (
+                                        <div key={idx} className="space-y-6">
+                                            <h2 className="text-2xl font-black text-slate-900 italic uppercase border-l-4 border-rose-500 pl-4">{group.title}</h2>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                                {group.verbs.map((v, i) => (
+                                                    <div key={i} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm text-left flex flex-col justify-between h-56">
+                                                        <div className="relative z-10"><span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">MASU: {v.polite}</span><h3 className="text-3xl font-black text-slate-900 italic mt-1 leading-none tracking-tighter uppercase">{v.dict}</h3></div>
+                                                        <p className="text-slate-400 font-extrabold text-sm uppercase italic">{v.ex}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
                     </main>
 
-                    {/* TEACHER MODAL SYSTEM */}
+                    {/* MODAL SYSTEM */}
                     {selected && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md" onClick={() => setSelected(null)}>
                             <div className="relative bg-white w-full max-w-xl rounded-[4rem] p-10 lg:p-14 shadow-2xl animate-zoom overflow-y-auto max-h-[90vh] no-scrollbar" onClick={e => e.stopPropagation()}>
@@ -270,7 +312,7 @@
                                 {selected.type === 'multitask' && (
                                     <div className="space-y-10">
                                         <div className="bg-slate-900 p-8 rounded-[2.5rem] text-center italic text-amber-400 uppercase tracking-tighter">
-                                            <h4 className="text-6xl font-black">{selected.data.p.split(' ')[0]} vs {selected.data.p.split(' ').pop()}</h4>
+                                            <h4 className="text-6xl font-black">{selected.data.p.split(' ')[0]} <span className="text-xl lowercase font-normal opacity-50">vs</span> {selected.data.p.split(' ').pop()}</h4>
                                         </div>
                                         <div className="p-8 bg-slate-50 rounded-3xl font-bold text-xl text-slate-700 italic border border-slate-100 leading-relaxed text-center italic">
                                             "{bridge === 'en' ? selected.data.logic_en : selected.data.logic_hi}"
