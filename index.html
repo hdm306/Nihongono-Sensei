@@ -11,14 +11,14 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFCFD; margin: 0; overflow-x: hidden; color: #1e293b; }
         .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(14px); }
         .animate-zoom { animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes zoom { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes zoom { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .battle-gradient { background: linear-gradient(135deg, #0d9488 0%, #0f172a 100%); }
         .clock-gradient { background: linear-gradient(135deg, #0f172a 0%, #334155 100%); }
         .logic-card { transition: all 0.3s ease; border: 1px solid #f1f5f9; }
         .logic-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05); }
         .chart-segment { transition: all 0.3s ease; cursor: pointer; }
-        .chart-segment:hover { stroke-width: 26; }
+        .chart-segment:hover { stroke-width: 26; opacity: 0.8; }
         @media (max-width: 1024px) {
             .mobile-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #020617; display: flex; justify-content: space-around; padding: 12px; z-index: 100; border-top: 1px solid #1e293b; border-radius: 24px 24px 0 0; }
             main { margin-bottom: 100px; }
@@ -42,7 +42,6 @@
             const [bridge, setBridge] = useState('en');
             const [selected, setSelected] = useState(null);
             const [chartFocus, setChartFocus] = useState(null);
-            const [builderStack, setBuilderStack] = useState([]);
 
             const handleNameSubmit = (e) => {
                 e.preventDefault();
@@ -57,116 +56,93 @@
                 return text.replace(/Himanshu|User|Student|Japa/g, userName);
             };
 
-            // --- DATA ENGINE ---
+            // --- DATA ENGINE: PARTICLES ---
             const particleGroups = [
                 { title: "Essential Basics", items: [
-                    { p:'wa', label_en:'Topic Marker', label_hi:'Vishay Marker', logic_en:'Sets the overall context. Defines what the sentence is about.', logic_hi:'Sentence kis baare mein hai yeh batata hai.', cases: [
+                    { p:'wa', label_en:'Topic Marker', label_hi:'Vishay Marker', logic_en:'Defines the overall context. It sets the stage for what the sentence is about.', logic_hi:'Sentence kis baare mein hai yeh batata hai.', cases: [
                         { label:'Identity', ex_en:'Watashi wa Himanshu desu. (I am Himanshu)', ex_hi:'Watashi wa Himanshu desu. (Main Himanshu hoon)' },
-                        { label:'Fact', ex_en:'Nihon wa kirei desu. (Japan is beautiful)', ex_hi:'Nihon wa kirei desu. (Japan sundar hai)' }
+                        { label:'Description', ex_en:'Nihon wa kirei desu. (Japan is beautiful)', ex_hi:'Nihon wa kirei desu. (Japan sundar hai)' }
                     ]},
-                    { p:'ga', label_en:'Subject Marker', label_hi:'Karta Marker', logic_en:'Highlights the specific actor. Identifies who is performing the action.', logic_hi:'Karta (actor) ko identify karta hai.', cases: [
+                    { p:'ga', label_en:'Subject Marker', label_hi:'Karta Marker', logic_en:'Identifies the specific actor. Use this to highlight "the one" performing the action.', logic_hi:'Karta (actor) ko identify karta hai.', cases: [
                         { label:'Identify', ex_en:'Himanshu ga ikimasu. (Himanshu is the one going)', ex_hi:'Himanshu ga ikimasu. (Himanshu hi jaayega)' }
                     ]},
-                    { p:'o', label_en:'Object Marker', label_hi:'Karma Marker', logic_en:'Marks the direct object of the verb—the thing being acted upon.', logic_hi:'Jis cheez par kaam ho raha hai use mark karta hai.', cases: [
+                    { p:'o', label_en:'Object Marker', label_hi:'Karma Marker', logic_en:'Marks the target of the action. It attaches to the thing being acted upon.', logic_hi:'Jis cheez par kaam ho raha hai use mark karta hai.', cases: [
                         { label:'Action', ex_en:'Kohii o nomimasu. (Drink coffee)', ex_hi:'Kohii o nomimasu. (Coffee peena)' }
                     ]}
                 ]},
-                { title: "Connectors & Movement", items: [
-                    { p:'ni', label_en:'Target/Time', label_hi:'Manzil/Samay', logic_en:'Marks specific time points or final destinations.', logic_hi:'Pakka samay ya manzil batane ke liye.', cases: [{ label:'Target', ex_en:'Kaisha ni ikimasu. (Go to office)', ex_hi:'Kaisha ni ikimasu. (Office jaana)' }] },
-                    { p:'de', label_en:'Action Location', label_hi:'Kaam Sthan', logic_en:'Marks the place where an action takes place.', logic_hi:'Jahan kaam ho raha hai us jagah ko mark karta hai.', cases: [{ label:'Action', ex_en:'Uchi de tabemasu. (Eat at home)', ex_hi:'Uchi de tabemasu. (Ghar mein khana)' }] },
-                    { p:'e', label_en:'Direction', label_hi:'Disha', logic_en:'Focuses on direction of travel.', logic_hi:'Yatra ki disha focus karta hai.', cases: [{ label:'Heading', ex_en:'Uchi e kaerimasu. (Heading home)', ex_hi:'Uchi e kaerimasu. (Ghar ki taraf jaana)' }] },
-                    { p:'no', label_en:'Linker', label_hi:'Sambandh', logic_en:'Shows possession or connection between nouns.', logic_hi:'Malkiyat (Ka/Ke/Ki) batata hai.', cases: [{ label:'Ownership', ex_en:'Watashi no pen. (My pen)', ex_hi:'Watashi no pen. (Mera pen)' }] },
-                    { p:'kara', label_en:'Start Point', label_hi:'Shuruat Point', logic_en:'Starting point (From).', logic_hi:'Shuruat ka point (Se) batata hai.', cases: [{ label:'From', ex_en:'Indo kara kita. (From India)', ex_hi:'Indo kara kita. (India se aaya)' }] },
-                    { p:'made', label_en:'End Point', label_hi:'Ant Point', logic_en:'Ending point (Until).', logic_hi:'Ant ka point (Tak) batata hai.', cases: [{ label:'Limit', ex_en:'Go-ji made. (Until 5)', ex_hi:'Go-ji made. (5 baje tak)' }] },
-                    { p:'to', label_en:'Companion', label_hi:'Saath', logic_en:'Used for companion or lists.', logic_hi:'Saath ya list ke liye.', cases: [{ label:'With', ex_en:'Tanaka-san to hanasu. (Talk with Tanaka)', ex_hi:'Tanaka-san to hanasu. (Tanaka ke saath baat)' }] },
-                    { p:'soshite', label_en:'Sequence', label_hi:'Phir', logic_en:'"And then" for connecting sentences.', logic_hi:'Sentences ko "Aur phir" ki tarah jodta hai.', cases: [{ label:'Then', ex_en:'Tabemasu. Soshite nemasu. (Eat. Then sleep)', ex_hi:'Tabemasu. Soshite nemasu. (Khana. Phir sona)' }] }
+                { title: "Movement & Timing", items: [
+                    { p:'ni', label_en:'Target/Time', label_hi:'Manzil/Samay', logic_en:'Marks specific time points or the final destination point.', logic_hi:'Manzil ya pakka samay batata hai.', cases: [{ label:'Goal', ex_en:'Kaisha ni ikimasu. (Go to office)', ex_hi:'Kaisha ni ikimasu. (Office jaana)' }] },
+                    { p:'de', label_en:'Action Location', label_hi:'Kaam Sthan', logic_en:'Marks the setting where an active event or task takes place.', logic_hi:'Jahan kaam ho raha hai us jagah ko mark karta hai.', cases: [{ label:'Action', ex_en:'Uchi de tabemasu. (Eat at home)', ex_hi:'Uchi de tabemasu. (Ghar mein khana)' }] },
+                    { p:'e', label_en:'Direction', label_hi:'Disha', logic_en:'Focuses on the path or heading direction of a journey.', logic_hi:'Yatra ki disha (direction) focus karta hai.', cases: [{ label:'Heading', ex_en:'Uchi e kaerimasu. (Heading home)', ex_hi:'Uchi e kaerimasu. (Ghar ki taraf jaana)' }] }
                 ]}
             ];
 
             const questionData = [
-                { p: 'Nan / Nani', label_en: 'What', label_hi: 'Kya', logic_en: 'Universal "What".', logic_hi: '"Kya" poochne ke liye.', cases: [{ label: 'Object', ex_en: 'Sore wa Nan desu ka? (What is that?)', ex_hi: 'Sore wa Nan desu ka? (Woh kya hai?)' }] },
-                { p: 'Dare / Donata', label_en: 'Who', label_hi: 'Kaun', logic_en: 'Standard / Polite Who.', logic_hi: '"Kaun" poochne ke liye.', cases: [{ label: 'Person', ex_en: 'Dare desu ka? (Who is it?)', ex_hi: 'Dare desu ka? (Kaun hai?)' }] },
-                { p: 'Doko', label_en: 'Where', label_hi: 'Kahan', logic_en: 'Location.', logic_hi: 'Jagah poochne ke liye.', cases: [{ label: 'Place', ex_en: 'Doko desu ka? (Where is it?)', ex_hi: 'Doko desu ka? (Kahan hai?)' }] },
-                { p: 'Itsu', label_en: 'When', label_hi: 'Kab', logic_en: 'Time.', logic_hi: 'Samay poochne ke liye.', cases: [{ label: 'Time', ex_en: 'Itsu desu ka? (When is it?)', ex_hi: 'Itsu desu ka? (Kab hai?)' }] }
+                { p: 'Nan / Nani', label_en: 'What', label_hi: 'Kya', logic_en: 'Universal "What". Use Nan before d/t/n sounds.', logic_hi: '"Kya" poochne ke liye.', cases: [{ label: 'Object', ex_en: 'Sore wa Nan desu ka? (What is that?)', ex_hi: 'Sore wa Nan desu ka? (Woh kya hai?)' }] },
+                { p: 'Dare / Donata', label_en: 'Who', label_hi: 'Kaun', logic_en: 'Dare (Standard) or Donata (Polite) version of Who.', logic_hi: '"Kaun" poochne ke liye.', cases: [{ label: 'Person', ex_en: 'Dare desu ka? (Who is it?)', ex_hi: 'Dare desu ka? (Kaun hai?)' }] },
+                { p: 'Doko', label_en: 'Where', label_hi: 'Kahan', logic_en: 'Asking for specific locations.', logic_hi: 'Jagah poochne ke liye.', cases: [{ label: 'Place', ex_en: 'Doko desu ka? (Where is it?)', ex_hi: 'Doko desu ka? (Kahan hai?)' }] }
             ];
 
             const multitaskers = [
-                { p: 'ni vs de', title: 'State vs Action', logic_en:'Ni is for static presence (being/sitting). De is for active work.', logic_hi:'Ni rehne ke liye. De kaam karne ke liye.', 
-                  stats: [ {l:'Static Presence', v:40, c:'#f43f5e', desc:'Uchi ni imasu'}, {l:'Dynamic Activity', v:60, c:'#0d9488', desc:'Uchi de tabemasu'} ],
+                { p: 'ni vs de', title: 'State vs Action', logic_en:'Ni is for static presence (being/sitting). De is for active activity (working/eating).', logic_hi:'Ni rehne ke liye. De kaam karne ke liye.', 
+                  stats: [ {l:'Static Being', v:40, c:'#f43f5e', desc:'Uchi ni imasu (At home)'}, {l:'Active Action', v:60, c:'#0d9488', desc:'Uchi de taberu (Eat at home)'} ],
                   compare: [
                     { side:'ni', desc_en:'Static Existence', desc_hi:'Bas hona', cases: [{label:'Ex', ex_en:'Uchi ni imasu. (I am at home)', ex_hi:'Uchi ni imasu. (Main ghar par hoon)'}] },
-                    { side:'de', desc_en:'Active Action', desc_hi:'Kaam karna', cases: [{label:'Ex', ex_en:'Uchi de tabemasu. (I eat at home)', ex_hi:'Uchi de tabemasu. (Main ghar par khata hoon)'}] }
+                    { side:'de', desc_en:'Active Activity', desc_hi:'Kaam karna', cases: [{label:'Ex', ex_en:'Uchi de tabemasu. (I eat at home)', ex_hi:'Uchi de tabemasu. (Main ghar par khata hoon)'}] }
                 ]},
-                { p: 'ni vs e', title: 'Goal vs Path', logic_en:'Ni arrival point. E direction.', logic_hi:'Ni manzil. E raste ki disha.', 
-                  stats: [ {l:'Arrival Target', v:70, c:'#f59e0b', desc:'Tokyo ni taita'}, {l:'Direction focus', v:30, c:'#0d9488', desc:'Tokyo e mukau'} ],
+                { p: 'ni vs e', title: 'Goal vs Path', logic_en:'Ni is the exact arrival point. E is the act of heading toward a direction.', logic_hi:'Ni manzil ka point hai. E raste ki disha hai.', 
+                  stats: [ {l:'Arrival Goal', v:70, c:'#f59e0b', desc:'Tokyo ni taita (Arrived)'}, {l:'Travel Direction', v:30, c:'#0d9488', desc:'Tokyo e mukau (Heading)'} ],
                   compare: [
-                    { side:'ni', desc_en:'Arrival', desc_hi:'Manzil focus', cases: [{label:'Ex', ex_en:'Tokyo ni taita. (Arrived)', ex_hi:'Tokyo ni taita. (Pahunch gaya)'}] },
-                    { side:'e', desc_en:'Path', desc_hi:'Disha focus', cases: [{label:'Ex', ex_en:'Tokyo e mukau. (Facing Tokyo)', ex_hi:'Tokyo e mukau. (Taraf)'}] }
+                    { side:'ni', desc_en:'Arrival', desc_hi:'Manzil focus', cases: [{label:'Ex', ex_en:'Tokyo ni taita. (Arrived in Tokyo)', ex_hi:'Tokyo ni taita. (Pahunch gaya)'}] },
+                    { side:'e', desc_en:'Heading', desc_hi:'Disha focus', cases: [{label:'Ex', ex_en:'Tokyo e mukau. (Facing Tokyo)', ex_hi:'Tokyo e mukau. (Taraf)'}] }
                 ]},
-                { p: 'e vs de', title: 'Path vs Place', logic_en:'E travel direction. De action location.', logic_hi:'E rasta batata hai. De kaam ki jagah.', 
-                  stats: [ {l:'Heading Path', v:50, c:'#8b5cf6', desc:'Gakkou e iku'}, {l:'Activity Site', v:50, c:'#0d9488', desc:'Gakkou de benkyou'} ],
+                { p: 'e vs de', title: 'Path vs Place', logic_en:'E is the journey path. De is the location where the work happens.', logic_hi:'E rasta batata hai. De kaam ki jagah batata hai.', 
+                  stats: [ {l:'Heading Path', v:50, c:'#8b5cf6', desc:'Gakkou e iku (To school)'}, {l:'Activity Site', v:50, c:'#0d9488', desc:'Gakkou de benkyou (Study)'} ],
                   compare: [
-                    { side:'e', desc_en:'Heading', desc_hi:'Taraf jaana', cases: [{label:'Ex', ex_en:'Kaisha e iku. (Heading to office)', ex_hi:'Kaisha e iku.'}] },
-                    { side:'de', desc_en:'Location', desc_hi:'Jagah', cases: [{label:'Ex', ex_en:'Kaisha de hataraku. (Work at office)', ex_hi:'Kaisha de hataraku.'}] }
+                    { side:'e', desc_en:'Directional', desc_hi:'Taraf jaana', cases: [{label:'Ex', ex_en:'Kaisha e iku. (Heading to office)', ex_hi:'Kaisha e iku. (Office ki taraf jaana)'}] },
+                    { side:'de', desc_en:'Task Location', desc_hi:'Jagah', cases: [{label:'Ex', ex_en:'Kaisha de hataraku. (Work at office)', ex_hi:'Kaisha de hataraku.'}] }
                 ]}
             ];
 
             const kosoadoData = {
-                kore: { logic_en: "This (near speaker)", logic_hi: "Yeh (bolne wale ke paas)", ex_en: "Kore wa pen desu.", ex_hi: "Kore wa pen desu. (Yeh pen hai)" },
-                sore: { logic_en: "That (near listener)", logic_hi: "Woh (sunne wale ke paas)", ex_en: "Sore wa hon desu.", ex_hi: "Sore wa hon desu. (Woh kitaab hai)" },
-                are: { logic_en: "That far away (from both)", logic_hi: "Woh door (dono se door)", ex_en: "Are wa yama desu.", ex_hi: "Are wa yama desu." },
-                dore: { logic_en: "Which one?", logic_hi: "Kaunsa?", ex_en: "Dore desu ka?", ex_hi: "Dore desu ka?" },
-                koko: { logic_en: "Here (speaker location)", logic_hi: "Yahan (vartaman jagah)", ex_en: "Koko wa Anand.", ex_hi: "Koko wa Anand." },
-                soko: { logic_en: "There (listener location)", logic_hi: "Wahan", ex_en: "Soko ni imasu.", ex_hi: "Soko ni imasu." },
-                asoko: { logic_en: "Over there (far)", logic_hi: "Wahan door", ex_en: "Asoko desu.", ex_hi: "Asoko desu." },
-                doko: { logic_en: "Where?", logic_hi: "Kahan?", ex_en: "Doko desu ka?", ex_hi: "Doko desu ka?" },
-                kono: { logic_en: "This + Noun", logic_hi: "Yeh [Cheez]", ex_en: "Kono hon.", ex_hi: "Kono hon." },
-                sono: { logic_en: "That + Noun", logic_hi: "Woh [Cheez]", ex_en: "Sono hito.", ex_hi: "Sono hito." },
-                ano: { logic_en: "That far + Noun", logic_hi: "Woh door wali [Cheez]", ex_en: "Ano mise.", ex_hi: "Ano mise." },
-                dono: { logic_en: "Which + Noun?", logic_hi: "Kaunsi [Cheez]?", ex_en: "Dono kasa?", ex_hi: "Dono kasa?" }
+                kore: { logic_en: "This: Refers to an item very close to the speaker. (Inside your hand/reach).", logic_hi: "Yeh: Jo cheez bolne wale ke ekdum paas ho.", ex_en: "Kore wa pen desu. (This is a pen)", ex_hi: "Kore wa pen desu. (Yeh pen hai)" },
+                sore: { logic_en: "That: Refers to an item close to the listener. (Across the table/near you).", logic_hi: "Woh: Jo cheez sunne wale ke paas ho.", ex_en: "Sore wa hon desu. (That is a book)", ex_hi: "Sore wa hon desu. (Woh kitaab hai)" },
+                are: { logic_en: "That: Refers to an item far from both speaker and listener. (Way over there).", logic_hi: "Woh: Jo cheez dono se door ho.", ex_en: "Are wa yama desu. (That over there is a mountain)", ex_hi: "Are wa yama desu. (Woh pahad hai)" },
+                dore: { logic_en: "Which one?: Used to ask which specific item among a group.", logic_hi: "Kaunsa?: Kai cheezon mein se kaunsa poochne ke liye.", ex_en: "Dore ga anata no? (Which one is yours?)", ex_hi: "Dore ga anata no? (Kaunsa aapka hai?)" },
+                koko: { logic_en: "Here: The exact location where the speaker is currently standing.", logic_hi: "Yahan: Jahan bolne wala abhi khada hai.", ex_en: "Koko wa Anand desu. (Here is Anand)", ex_hi: "Koko wa Anand desu. (Yahan Anand hai)" },
+                doko: { logic_en: "Where: Interrogative for asking locations.", logic_hi: "Kahan: Jagah poochne ke liye.", ex_en: "Doko desu ka? (Where is it?)", ex_hi: "Doko desu ka? (Kahan hai?)" },
+                kono: { logic_en: "This [Noun]: Pointer that MUST be followed by an object name.", logic_hi: "Yeh [Cheez]: Iske saath hamesha cheez ka naam bolna padta hai.", ex_en: "Kono hon wa takai. (This book is expensive)", ex_hi: "Kono hon wa takai. (Yeh kitaab mehengi hai)" }
             };
 
             const kosoadoRows = [
                 { title: "Things", row: ["kore", "sore", "are", "dore"], en: "Objects", hi: "Cheezein" },
                 { title: "Places", row: ["koko", "soko", "asoko", "doko"], en: "Locations", hi: "Jagah" },
-                { title: "Adjectives", row: ["kono", "sono", "ano", "dono"], en: "+ Noun", hi: "Noun chahiye" }
+                { title: "Adjectives", row: ["kono", "sono", "ano", "dono"], en: "+ Noun Needed", hi: "Noun chahiye" }
             ];
 
             const clockData = {
                 hours: ['ichi-ji', 'ni-ji', 'san-ji', 'yo-ji ★', 'go-ji', 'roku-ji', 'shichi-ji ★', 'hachi-ji', 'ku-ji ★', 'juu-ji'],
                 minutes: ['ippun ★', 'nifun', 'sanpun ★', 'yonpun ★', 'gofun', 'roppun ★', 'nanafun', 'happun ★', 'kyuufun', 'juppun ★'],
-                markers: [{t:'GOZEN', m:'AM', hi:'Subah'},{t:'GOGO', m:'PM', hi:'Shaam'},{t:'GORO', m:'Around', hi:'Lagbhag'}]
+                markers: [{t:'Gozen', m:'AM', hi:'Subah'},{t:'Gogo', m:'PM', hi:'Shaam'},{t:'Goro', m:'Around', hi:'Lagbhag'}]
             };
 
             const calendarData = {
-                months: [{ m: 'Jan', r: 'Ichi-gatsu' }, { m: 'Feb', r: 'Ni-gatsu' }, { m: 'Mar', r: 'San-gatsu' }, { m: 'Apr', r: 'Shi-gatsu ★' }, { m: 'May', r: 'Go-gatsu' }, { m: 'Jun', r: 'Roku-gatsu' }, { m: 'Jul', r: 'Shichi-gatsu ★' }, { m: 'Aug', r: 'Hachi-gatsu' }, { m: 'Sep', r: 'Ku-gatsu ★' }, { m: 'Oct', r: 'Juu-gatsu' }, { m: 'Nov', r: 'Juuichi-gatsu' }, { m: 'Dec', r: 'Juuni-gatsu' }],
+                months: [{ m: 'Jan', r: 'Ichi-gatsu' }, { m: 'Feb', r: 'Ni-gatsu' }, { m: 'Apr', r: 'Shi-gatsu ★' }, { m: 'Jul', r: 'Shichi-gatsu ★' }, { m: 'Sep', r: 'Ku-gatsu ★' }, { m: 'Dec', r: 'Juuni-gatsu' }],
                 weekdays: [{ d: 'Mon', r: 'Getsu-youbi', hi: 'Chandra-vaar' }, { d: 'Tue', r: 'Ka-youbi', hi: 'Agni-vaar' }, { d: 'Sun', r: 'Nichi-youbi', hi: 'Surya-vaar' }],
                 relative: [
-                    { p:'Kyou', label_en:'Today', label_hi:'Aaj', logic_en:'Current day.', cases:[{label:'Ex', ex_en:'Kyou wa atsui. (Today is hot)', ex_hi:'Kyou wa atsui.'}]},
-                    { p:'Ashita', label_en:'Tomorrow', label_hi:'Aane wala kal', logic_en:'Day after today.', cases:[{label:'Ex', ex_en:'Ashita ikimasu.', ex_hi:'Ashita ikimasu.'}]},
-                    { p:'Kinou', label_en:'Yesterday', label_hi:'Beeta hua kal', logic_en:'Day before today.', cases:[{label:'Ex', ex_en:'Kinou benkyou shimashita.', ex_hi:'Kinou benkyou shimashita.'}]}
+                    { p:'Kyou', label_en:'Today', label_hi:'Aaj', logic_en:'The current day.', cases:[{label:'Ex', ex_en:'Kyou wa atsui desu. (Today is hot)', ex_hi:'Kyou wa atsui desu. (Aaj garmi hai)'}]},
+                    { p:'Ashita', label_en:'Tomorrow', label_hi:'Aane wala kal', logic_en:'The day after today.', cases:[{label:'Ex', ex_en:'Ashita ikimasu. (Will go tomorrow)', ex_hi:'Ashita ikimasu. (Kal jaunga)'}]},
+                    { p:'Kinou', label_en:'Yesterday', label_hi:'Beeta hua kal', logic_en:'The day before today.', cases:[{label:'Ex', ex_en:'Kinou benkyou shimashita. (Studied yesterday)', ex_hi:'Kinou benkyou shimashita. (Kal padhai ki thi)'}]},
+                    { p:'Raishuu', label_en:'Next week', label_hi:'Agla hafta', logic_en:'The week after this one.', cases:[{label:'Ex', ex_en:'Raishuu kimasu. (Will come next week)', ex_hi:'Raishuu kimasu. (Agle hafte aaunga)'}]}
                 ]
             };
 
-            const basicNumbers = [
-                {n:'1', r:'ichi'}, {n:'2', r:'ni'}, {n:'3', r:'san'}, 
-                {n:'4', r:'shi / yon'}, {n:'5', r:'go'}, {n:'6', r:'roku'}, 
-                {n:'7', r:'shichi / nana'}, {n:'8', r:'hachi'}, {n:'9', r:'ku / kyuu'}, 
-                {n:'10', r:'juu'}, {n:'100', r:'hyaku'}, {n:'1,000', r:'sen'}, {n:'10,000', r:'man'}
-            ];
+            const basicNumbers = [{n:'1', r:'ichi'},{n:'4', r:'shi / yon'},{n:'7', r:'shichi / nana'},{n:'9', r:'ku / kyuu'},{n:'10', r:'juu'},{n:'100', r:'hyaku'},{n:'1,000', r:'sen'},{n:'10,000', r:'man'}];
 
             const verbGroups = [
-                { title: 'Group 1 (Godan)', logic_en: 'Change "u" sound to "i" and add "masu".', logic_hi: '"u" hata kar "i" lagaye aur "masu" jode.', verbs: [{p:'Iku', polite:'Ikimasu', label_en:'Go', label_hi:'Jaana'}, {p:'Nomu', polite:'Nomimasu', label_en:'Drink', label_hi:'Peena'}] },
-                { title: 'Group 2 (Ichidan)', logic_en: 'Simply drop "ru" and add "masu".', logic_hi: 'Bas "ru" hata kar "masu" jode.', verbs: [{p:'Taberu', polite:'Tabemasu', label_en:'Eat', label_hi:'Khana'}] },
-                { title: 'Group 3 (Irregular)', logic_en: 'Fixed patterns to memorize.', logic_hi: 'Inhe yaad karna hota hai.', verbs: [{p:'Suru', polite:'Shimasu', label_en:'Do', label_hi:'Karna'}, {p:'Kuru', polite:'Kimasu', label_en:'Come', label_hi:'Aana'}] }
+                { title: 'Group 1 (Godan)', logic_en: 'Change the final "u" sound to "i" and add "masu".', logic_hi: '"u" hata kar "i" lagaye aur "masu" jode.', verbs: [{p:'Iku', polite:'Ikimasu', label_en:'Go', label_hi:'Jaana'}, {p:'Nomu', polite:'Nomimasu', label_en:'Drink', label_hi:'Peena'}] },
+                { title: 'Group 2 (Ichidan)', logic_en: 'Simply drop the "ru" and add "masu".', logic_hi: 'Bas "ru" hata kar "masu" jode.', verbs: [{p:'Taberu', polite:'Tabemasu', label_en:'Eat', label_hi:'Khana'}] }
             ];
-
-            const builderAssets = {
-                subjects: ['Watashi', 'Anata', 'Tanaka-san', 'Himanshu-san'],
-                particles: ['wa', 'ga', 'o', 'ni', 'de', 'e', 'no', 'to'],
-                objects: ['Kohii', 'Hon', 'Mizu', 'Ranchi', 'Nihon'],
-                verbs: ['desu', 'ikimasu', 'tabemasu', 'nomimasu', 'shimasu']
-            };
 
             const DonutChart = ({ data, size = "24", onHover }) => {
                 const total = data.reduce((acc, item) => acc + item.v, 0);
@@ -211,12 +187,12 @@
 
             return (
                 <div className="min-h-screen flex flex-col lg:flex-row">
-                    {/* DESKTOP SIDEBAR */}
+                    {/* SIDEBAR */}
                     <aside className="hidden lg:flex w-32 bg-slate-950 flex-col items-center py-10 fixed h-full z-50 shadow-2xl">
                         <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center text-white font-black text-xl mb-12">N</div>
                         <nav className="flex flex-col gap-6 w-full px-2 text-center font-black text-[9px] tracking-widest uppercase">
                             <SidebarBtn active={activeTab === 'particles'} icon="layers" label="Particles" onClick={() => setActiveTab('particles')} />
-                            <SidebarBtn active={activeTab === 'builder'} icon="auto_fix_high" label="Builder" onClick={() => setActiveTab('builder')} />
+                            <SidebarBtn active={activeTab === 'questions'} icon="help_outline" label="Questions" onClick={() => setActiveTab('questions')} />
                             <SidebarBtn active={activeTab === 'kosoado'} icon="map" label="Spatial" onClick={() => setActiveTab('kosoado')} />
                             <SidebarBtn active={activeTab === 'calendar'} icon="calendar_today" label="Calendar" onClick={() => setActiveTab('calendar')} />
                             <SidebarBtn active={activeTab === 'numbers'} icon="tag" label="Numbers" onClick={() => setActiveTab('numbers')} />
@@ -228,8 +204,8 @@
                     {/* MOBILE BOTTOM NAV */}
                     <div className="mobile-bottom-nav lg:hidden">
                         <SidebarBtn active={activeTab === 'particles'} icon="layers" label="Part." onClick={() => setActiveTab('particles')} />
-                        <SidebarBtn active={activeTab === 'builder'} icon="auto_fix_high" label="Build" onClick={() => setActiveTab('builder')} />
                         <SidebarBtn active={activeTab === 'kosoado'} icon="map" label="Spat." onClick={() => setActiveTab('kosoado')} />
+                        <SidebarBtn active={activeTab === 'calendar'} icon="calendar_today" label="Cal." onClick={() => setActiveTab('calendar')} />
                         <SidebarBtn active={activeTab === 'numbers'} icon="tag" label="Num." onClick={() => setActiveTab('numbers')} />
                         <SidebarBtn active={activeTab === 'verbs'} icon="bolt" label="Verb" onClick={() => setActiveTab('verbs')} />
                     </div>
@@ -285,21 +261,20 @@
                                 </div>
                             )}
 
-                            {/* TAB: BUILDER */}
-                            {activeTab === 'builder' && (
-                                <div className="space-y-12 animate-zoom">
-                                    <h2 className="text-3xl font-black text-slate-900 uppercase italic">Sentence Lab</h2>
-                                    <div className="bg-slate-950 p-10 rounded-[4rem] min-h-[150px] shadow-2xl flex flex-wrap gap-4 items-center border-4 border-teal-500/20">
-                                        {builderStack.length === 0 ? <p className="text-slate-600 font-black italic text-2xl mx-auto opacity-50">Draft sentence here...</p> : builderStack.map((w, i) => (
-                                            <button key={i} onClick={() => setBuilderStack(prev => prev.filter((_, idx) => idx !== i))} className="bg-white px-6 py-4 rounded-2xl font-black text-xl italic hover:bg-rose-500 hover:text-white transition-all transform hover:-rotate-2">{w}</button>
-                                        ))}
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                                        {Object.entries(builderAssets).map(([cat, items]) => (
-                                            <div key={cat} className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm space-y-6 text-center">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b pb-4">{cat}</p>
-                                                <div className="flex flex-wrap justify-center gap-2">{items.map(it => <button key={it} onClick={() => setBuilderStack(p => [...p, it])} className="builder-btn px-4 py-2 bg-slate-50 border rounded-xl font-bold text-xs hover:bg-teal-500 hover:text-white transition-all uppercase tracking-tight">{it}</button>)}</div>
-                                            </div>
+                            {/* TAB: QUESTIONS */}
+                            {activeTab === 'questions' && (
+                                <div className="space-y-10 animate-zoom">
+                                    <h2 className="text-2xl font-black text-slate-900 border-l-4 border-teal-500 pl-4 uppercase">Interrogatives</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {questionData.map((item, i) => (
+                                            <button key={i} onClick={() => setSelected({type: 'particle', data: item})} className="logic-card group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left h-56 relative overflow-hidden flex flex-col justify-between">
+                                                <div className="absolute top-0 right-0 p-10 text-slate-50 font-black text-8xl italic uppercase leading-none">{item.p.split(' ')[0]}</div>
+                                                <div className="relative z-10">
+                                                    <p className="text-[10px] font-black text-teal-600 uppercase mb-1">{bridge === 'en' ? item.label_en : item.label_hi}</p>
+                                                    <h3 className="text-2xl lg:text-3xl font-black text-slate-900 italic uppercase tracking-tighter break-words max-w-[150px]">{item.p}</h3>
+                                                </div>
+                                                <p className="text-slate-500 font-extrabold text-xs relative z-10">{bridge === 'en' ? 'Usage' : 'Sikhein'}</p>
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
@@ -311,7 +286,7 @@
                                     <div className="overflow-x-auto no-scrollbar">
                                         <table className="w-full text-left min-w-[800px]">
                                             <thead className="bg-slate-950 text-white text-[10px] uppercase font-black tracking-widest">
-                                                <tr><th className="p-10">Type</th><th className="p-10 text-teal-400">KO (Near Me)</th><th className="p-10 text-blue-400">SO (Near You)</th><th className="p-10 text-emerald-400">A (Far Both)</th><th className="p-10 text-rose-400">DO (Which?)</th></tr>
+                                                <tr><th className="p-10">Type</th><th className="p-10 text-teal-400">KO (Near Me)</th><th className="p-10 text-blue-400">SO (Near You)</th><th className="p-10 text-emerald-400">A (Far)</th><th className="p-10 text-rose-400">DO (Which?)</th></tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100 font-bold text-sm">
                                                 {kosoadoRows.map((obj, i) => (
@@ -393,7 +368,7 @@
                                             <h2 className="text-2xl font-black text-slate-900 border-l-4 border-rose-500 pl-4 uppercase">{group.title}</h2>
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                                 {group.verbs.map((v, i) => (
-                                                    <button key={i} onClick={() => setSelected({type: 'particle', data: {...v, p: v.p, logic_en: group.logic_en, logic_hi: group.logic_hi}})} className="group bg-white p-10 rounded-[2.5rem] border border-slate-100 text-left flex flex-col justify-between h-56 transition-all hover:shadow-xl relative overflow-hidden">
+                                                    <button key={i} onClick={() => setSelected({type: 'particle', data: {...v, p: v.p, logic_en: group.logic_en, logic_hi: group.logic_hi}})} className="logic-card bg-white p-10 rounded-[2.5rem] border border-slate-100 text-left flex flex-col justify-between h-56 transition-all hover:shadow-xl relative overflow-hidden">
                                                         <div className="absolute -bottom-4 -right-4 p-4 text-slate-50 font-black text-8xl leading-none uppercase">{v.p[0]}</div>
                                                         <div className="relative z-10"><span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">MASU: {v.polite}</span><h3 className="text-3xl font-black text-slate-900 mt-2 leading-none tracking-tighter uppercase">{v.p}</h3></div>
                                                         <p className="text-slate-400 font-extrabold text-sm uppercase relative z-10">{bridge === 'en' ? v.label_en : v.label_hi}</p>
