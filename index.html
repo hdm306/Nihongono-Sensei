@@ -74,6 +74,20 @@
                 ]}
             ];
 
+            const questionMarkers = [
+                { p: 'Nani / Nan', label_en: 'What', label_hi: 'Kya', logic_en: 'Often paired with particle o (object) or ga (subject).', logic_hi: 'Aksar "o" ya "ga" particle ke saath istemal hota hai.', cases: [{label: 'Ex', ex_en: 'Nani o shimashita ka? (What did you do?)', ex_hi: 'Nani o shimashita ka? (Aapne kya kiya?)'}] },
+                { p: 'Dare', label_en: 'Who', label_hi: 'Kaun', logic_en: 'Frequently followed by particle ga to ask "who" performs an action.', logic_hi: 'Aksar "ga" ke saath lagta hai pucho kaun kaam kar raha hai.', cases: [{label: 'Ex', ex_en: 'Dare ga ikimasu ka? (Who is going?)', ex_hi: 'Dare ga ja raha hai?'}] },
+                { p: 'Doko', label_en: 'Where', label_hi: 'Kahan', logic_en: 'Used with particles ni (at/in) or e (toward).', logic_hi: 'Isko "ni" ya "e" ke saath use karte hain.', cases: [{label: 'Ex', ex_en: 'Doko ni arimasu ka? (Where is it?)', ex_hi: 'Kahan hai?'}] },
+                { p: 'Itsu', label_en: 'When', label_hi: 'Kab', logic_en: 'Usually stands alone without a particle.', logic_hi: 'Iske saath aksar particle nahi lagta.', cases: [{label: 'Ex', ex_en: 'Itsu kimasu ka? (When will you come?)', ex_hi: 'Kab aaoge?'}] },
+                { p: 'Naze / Doushite', label_en: 'Why', label_hi: 'Kyun', logic_en: 'Used to ask for a reason or explanation.', logic_hi: 'Karan ya wajah puchne ke liye.', cases: [{label: 'Ex', ex_en: 'Doushite desu ka? (Why is it?)', ex_hi: 'Aisa kyun hai?'}] },
+                { p: 'Dou', label_en: 'How', label_hi: 'Kaise', logic_en: 'Asks about the state, condition, or method.', logic_hi: 'Haalat ya tarika puchne ke liye.', cases: [{label: 'Ex', ex_en: 'Dou shimashita ka? (How did it happen / What happened?)', ex_hi: 'Kaise hua?'}] },
+                { p: 'Dore', label_en: 'Which one', label_hi: 'Kaunsa (3+)', logic_en: 'Used with particle ga to select from three or more items.', logic_hi: '3 ya zyada cheezon mein se chunne ke liye.', cases: [{label: 'Ex', ex_en: 'Dore ga suki? (Which one do you like?)', ex_hi: 'Kaunsa pasand hai?'}] },
+                { p: 'Dochira', label_en: 'Which / Where', label_hi: 'Kaunsa / Kidhar', logic_en: 'Used for choosing between two options or asking for directions (polite).', logic_hi: 'Do cheezon mein chunna ya disha puchna.', cases: [{label: 'Ex', ex_en: 'Dochira ga ii? (Which is better?)', ex_hi: 'Kaunsa behtar hai?'}] },
+                { p: 'Ikura', label_en: 'How much', label_hi: 'Kitna (Price)', logic_en: 'Specifically used for price or cost.', logic_hi: 'Keemat puchne ke liye.', cases: [{label: 'Ex', ex_en: 'Kore wa ikura desu ka? (How much is this?)', ex_hi: 'Yeh kitne ka hai?'}] },
+                { p: 'Ikutsu', label_en: 'How many', label_hi: 'Kitne (Count)', logic_en: 'Used for counting physical objects.', logic_hi: 'Cheezein ginne ke liye.', cases: [{label: 'Ex', ex_en: 'Ikutsu arimasu ka? (How many are there?)', ex_hi: 'Kitne hain?'}] },
+                { p: 'Ka', label_en: 'Question Particle', label_hi: 'Sawal Marker', logic_en: 'Placed at the end of a sentence to signal it is a question.', logic_hi: 'Sentence ke aakhir mein sawal banane ke liye.', cases: [{label: 'Ex', ex_en: 'Sou desu ka? (Is that so?)', ex_hi: 'Aisa hai kya?'}] }
+            ];
+
             const multitaskers = [
                 { p: 'wa vs ga', title: 'Topic vs Subject', logic_en:'Wa defines the context. Ga highlights the specific actor.', logic_hi:'Wa saamanya vishay hai. Ga vishisht karta par zor deta hai.', 
                   stats: [ {l:'Context', v:50, c:'#8b5cf6', desc:'Wa (Topic setting)'}, {l:'Emphasis', v:50, c:'#ec4899', desc:'Ga (Subject focus)'} ],
@@ -198,6 +212,7 @@
                         <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center text-white font-black text-xl mb-12">N</div>
                         <nav className="flex flex-col gap-6 w-full px-2 text-center font-black text-[9px] tracking-widest uppercase">
                             <SidebarBtn active={activeTab === 'particles'} icon="layers" label="Particles" onClick={() => setActiveTab('particles')} />
+                            <SidebarBtn active={activeTab === 'questions'} icon="help_outline" label="Questions" onClick={() => setActiveTab('questions')} />
                             <SidebarBtn active={activeTab === 'kosoado'} icon="map" label="Spatial" onClick={() => setActiveTab('kosoado')} />
                             <SidebarBtn active={activeTab === 'calendar'} icon="calendar_today" label="Calendar" onClick={() => setActiveTab('calendar')} />
                             <SidebarBtn active={activeTab === 'numbers'} icon="tag" label="Numbers" onClick={() => setActiveTab('numbers')} />
@@ -208,6 +223,7 @@
 
                     <div className="mobile-bottom-nav lg:hidden">
                         <SidebarBtn active={activeTab === 'particles'} icon="layers" label="Part." onClick={() => setActiveTab('particles')} />
+                        <SidebarBtn active={activeTab === 'questions'} icon="help_outline" label="Quest." onClick={() => setActiveTab('questions')} />
                         <SidebarBtn active={activeTab === 'kosoado'} icon="map" label="Spat." onClick={() => setActiveTab('kosoado')} />
                         <SidebarBtn active={activeTab === 'calendar'} icon="calendar_today" label="Cal." onClick={() => setActiveTab('calendar')} />
                         <SidebarBtn active={activeTab === 'numbers'} icon="tag" label="Num." onClick={() => setActiveTab('numbers')} />
@@ -250,6 +266,21 @@
                                                 </button>
                                             ))}
                                         </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'questions' && (
+                                <div className="space-y-6 animate-zoom">
+                                    <h2 className="text-2xl font-black text-slate-900 border-l-4 border-amber-500 pl-4 uppercase">Question Markers (疑問詞)</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {questionMarkers.map((item, i) => (
+                                            <button key={i} onClick={() => setSelected({type: 'particle', data: item})} className="logic-card group bg-white p-8 rounded-[2.5rem] flex flex-col justify-between h-56 relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 p-6 text-slate-50 font-black text-6xl leading-none uppercase">?</div>
+                                                <div className="relative z-10 text-left text-sm"><p className="text-[10px] font-black text-amber-600 uppercase mb-1">{bridge === 'en' ? item.label_en : item.label_hi}</p><h3 className="text-3xl font-black text-slate-900 uppercase">{item.p}</h3></div>
+                                                <p className="text-slate-400 font-extrabold text-xs relative z-10">Explain Usage</p>
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             )}
